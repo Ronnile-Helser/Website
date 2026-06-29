@@ -28,6 +28,51 @@
   }
   a{color:inherit;text-decoration:none}
 
+  /* INTRO OVERLAY */
+  #intro{
+    position:fixed;inset:0;z-index:1000;
+    background:var(--bg);
+    display:flex;align-items:center;justify-content:center;
+    opacity:1;
+    transition:opacity 1.6s ease;
+  }
+  #intro.hide{opacity:0;pointer-events:none}
+  .intro-inner{
+    text-align:center;
+    padding:0 2rem;
+    transform:translateY(0);
+    animation:introRise 1.2s cubic-bezier(.2,.7,.2,1) both;
+  }
+  .intro-bar{
+    height:1px;width:0;
+    background:linear-gradient(90deg,transparent,var(--khaki),transparent);
+    margin:0 auto;
+    animation:barGrow 2s ease .3s forwards;
+  }
+  .intro-word{
+    font-size:clamp(2.4rem,7vw,4.4rem);
+    font-weight:300;
+    letter-spacing:.5em;
+    text-transform:uppercase;
+    color:var(--text);
+    margin:1.6rem 0 1.6rem .5em; /* offset to balance letter-spacing */
+    padding-left:0;
+    opacity:0;
+    animation:wordFade 1.8s ease .7s forwards;
+  }
+  .intro-sub{
+    font-size:.72rem;
+    letter-spacing:.35em;
+    text-transform:uppercase;
+    color:var(--khaki-light);
+    opacity:0;
+    margin-top:.2rem;
+    animation:wordFade 1.8s ease 1.1s forwards;
+  }
+  @keyframes barGrow{from{width:0}to{width:min(420px,80vw)}}
+  @keyframes wordFade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes introRise{from{opacity:0}to{opacity:1}}
+
   /* NAV */
   nav{
     position:fixed;top:0;left:0;right:0;z-index:100;
@@ -260,6 +305,16 @@
 </head>
 <body>
 
+<!-- INTRO OVERLAY -->
+<div id="intro">
+  <div class="intro-inner">
+    <div class="intro-bar"></div>
+    <div class="intro-word">Welcome</div>
+    <div class="intro-sub">Ronnile Helser &middot; IT &amp; Security</div>
+    <div class="intro-bar"></div>
+  </div>
+</div>
+
 <nav>
   <div class="brand">RH</div>
   <button class="menu-toggle" aria-label="Menu">&#9776;</button>
@@ -277,10 +332,10 @@
 <section id="hero">
   <canvas id="bg-canvas"></canvas>
   <div class="hero-content">
-    <div class="hero-eyebrow reveal">IT Service Analyst &middot; Aspiring AI Security Engineer</div>
-    <h1 class="reveal">Ronnile <span class="accent">Helser</span></h1>
-    <div class="hero-goesby reveal">Goes by <span>Ronnie</span></div>
-    <p class="subtitle reveal">Tier 2 IT professional and cybersecurity instructor building toward AI security engineering — grounded in hands-on infrastructure, threat analysis, and defensive tooling.</p>
+    <div class="hero-eyebrow reveal">Tier 2 IT Service Analyst &middot; Cybersecurity Instructor</div>
+    <h1 class="reveal">Ronnile <span class="accent">&ldquo;Ronnie&rdquo;</span> Helser</h1>
+    <div class="hero-goesby reveal">Columbus, OH &middot; Open to Remote</div>
+    <p class="subtitle reveal">CompTIA-certified IT professional with 3+ years across help desk, network administration, and support leadership &mdash; now building toward AI security engineering through hands-on infrastructure, threat analysis, and defensive tooling.</p>
     <div class="cert-badges reveal">
       <a href="https://cp.certmetrics.com/comptia/en/public/verify/credential/62P8RX6SNEVE1B5T" target="_blank" rel="noopener"><span>Security+ &#8599;</span></a>
       <a href="https://cp.certmetrics.com/comptia/en/public/verify/credential/XFLGVEH5EJVQ1P91" target="_blank" rel="noopener"><span>Network+ &#8599;</span></a>
@@ -292,6 +347,7 @@
     <div class="hero-cta reveal">
       <a href="#projects" class="btn btn-primary">View Projects</a>
       <a href="#contact" class="btn btn-ghost">Get in Touch</a>
+      <a href="https://www.linkedin.com/in/ronnile-helser-3b1585251/" target="_blank" rel="noopener" class="btn btn-ghost">LinkedIn &#8599;</a>
     </div>
   </div>
   <div class="scroll-cue">Scroll &darr;</div>
@@ -313,9 +369,12 @@
     <div class="skills-box reveal">
       <h3>Core Toolset</h3>
       <div class="skill-tags">
-        <span>Wireshark</span><span>Windows Admin</span>
-        <span>Python</span><span>MITRE ATT&amp;CK</span><span>Network Admin</span>
-        <span>Endpoint Security</span><span>Incident Triage</span>
+        <span>Active Directory</span><span>Microsoft 365 Admin</span>
+        <span>Defender for Endpoint</span><span>Azure</span>
+        <span>Windows Server</span><span>Wireshark</span>
+        <span>Jira</span><span>SharePoint</span><span>Intune / MDM</span>
+        <span>Python</span><span>MITRE ATT&amp;CK</span>
+        <span>Network Admin</span><span>Endpoint Security</span><span>Incident Triage</span>
       </div>
     </div>
   </div>
@@ -330,34 +389,40 @@
   </div>
   <div class="timeline">
     <div class="tl-item reveal">
-      <div class="role">Tier 2 IT Service Analyst</div>
-      <div class="org">Crane Group</div>
-      <div class="period">Current</div>
-      <div class="desc">Tier 2 support and endpoint operations across a managed device fleet — troubleshooting OS updates, endpoint security tooling, and escalated incidents.</div>
-    </div>
-    <div class="tl-item reveal">
       <div class="role">Substitute Cybersecurity Instructor</div>
       <div class="org">C-TEC of Licking County</div>
-      <div class="period">Current</div>
+      <div class="period">Feb 2026 &ndash; Present</div>
       <div class="desc">Teaching foundational cybersecurity concepts and hands-on lab work to students entering the field.</div>
+    </div>
+    <div class="tl-item reveal">
+      <div class="role">Tier 2 IT Service Analyst</div>
+      <div class="org">Crane Group</div>
+      <div class="period">Aug 2025 &ndash; Present</div>
+      <div class="desc">Tier 2 support and endpoint operations across a managed device fleet &mdash; troubleshooting OS updates, endpoint security tooling, and escalated incidents.</div>
     </div>
     <div class="tl-item reveal">
       <div class="role">Help Desk Supervisor &middot; Tier 2 Technician</div>
       <div class="org">Virtual Technologies Group</div>
-      <div class="period">Previous</div>
-      <div class="desc">Promoted into a leadership role overseeing help desk operations, ticket triage, and support staff.</div>
+      <div class="period">Oct 2024 &ndash; Aug 2025</div>
+      <div class="desc">Promoted from Tier 2 Technician into a supervisory role overseeing help desk quality, training, and customer experience &mdash; managing ticket triage and supporting staff across client environments.</div>
     </div>
     <div class="tl-item reveal">
-      <div class="role">IT Support Specialist</div>
+      <div class="role">IT Help Desk Technician I</div>
+      <div class="org">Hudson Valley Credit Union &middot; Contract</div>
+      <div class="period">Jul 2024 &ndash; Oct 2024</div>
+      <div class="desc">Managed and created users in Active Directory, supported 50+ independent banking programs, and resolved escalated issues across M365 and core banking software &mdash; all under PCI DSS compliance standards.</div>
+    </div>
+    <div class="tl-item reveal">
+      <div class="role">IT Support Specialist I</div>
       <div class="org">OTC Industrial Technologies</div>
-      <div class="period">Previous</div>
-      <div class="desc">End-user support, hardware/software troubleshooting, and infrastructure assistance.</div>
+      <div class="period">Sep 2023 &ndash; Jul 2024</div>
+      <div class="desc">Resolved escalated tickets via Jira, managed users and roles in Active Directory, administered mobile device management, and authored knowledge base articles to improve team efficiency.</div>
     </div>
     <div class="tl-item reveal">
       <div class="role">IT End-User Support Engineer</div>
       <div class="org">DataServ</div>
-      <div class="period">Previous</div>
-      <div class="desc">Front-line technical support and system maintenance for end users across the organization.</div>
+      <div class="period">Oct 2022 &ndash; Sep 2023</div>
+      <div class="desc">Supported a 14-building school district &mdash; imaging 50+ devices for incoming staff, leading a mass switch-replacement networking project, and providing hands-on support across a wide range of hardware and Office 365.</div>
     </div>
   </div>
 </section>
@@ -371,15 +436,33 @@
   </div>
   <div class="projects-grid">
     <div class="project-card reveal">
+      <div class="tag">Digital Forensics</div>
+      <h3>Rhino Hunt CTF</h3>
+      <p>Completed the Rhino Hunt forensics challenge &mdash; recovering deleted files, carving data from disk and network captures, and reconstructing evidence to solve the scenario.</p>
+      <div class="stack"><span>Forensics</span><span>Data Carving</span><span>CTF</span></div>
+    </div>
+    <div class="project-card reveal">
+      <div class="tag">Identity &amp; Infrastructure</div>
+      <h3>Domain Controller Build</h3>
+      <p>Stood up and configured a Windows Server domain controller in a home lab &mdash; deploying Active Directory, managing users, groups, and Group Policy across the domain.</p>
+      <div class="stack"><span>Active Directory</span><span>Windows Server</span><span>Group Policy</span></div>
+    </div>
+    <div class="project-card reveal">
+      <div class="tag">Cloud &amp; Identity</div>
+      <h3>Azure Tenant Configuration</h3>
+      <p>Built and configured a personal Microsoft Azure tenant &mdash; setting up Entra ID, users, and cloud identity to practice modern cloud administration and security.</p>
+      <div class="stack"><span>Azure</span><span>Entra ID</span><span>Cloud Admin</span></div>
+    </div>
+    <div class="project-card reveal">
       <div class="tag">Network Analysis</div>
       <h3>Packet Capture &amp; Traffic Analysis</h3>
-      <p>Hands-on traffic capture and analysis with Wireshark — inspecting protocols, following streams, and identifying anomalies across lab network traffic.</p>
+      <p>Hands-on traffic capture and analysis with Wireshark &mdash; inspecting protocols, following streams, and identifying anomalies across lab network traffic.</p>
       <div class="stack"><span>Wireshark</span><span>Networking</span><span>Protocol Analysis</span></div>
     </div>
     <div class="project-card reveal">
       <div class="tag">Threat Detection</div>
       <h3>Attack Technique Practice</h3>
-      <p>Applied study of real attack patterns — MITRE ATT&amp;CK mapping, business email compromise phishing, default credential attacks, and threat actor classification.</p>
+      <p>Applied study of real attack patterns &mdash; MITRE ATT&amp;CK mapping, business email compromise phishing, default credential attacks, and threat actor classification.</p>
       <div class="stack"><span>MITRE ATT&amp;CK</span><span>Phishing</span><span>Detection</span></div>
     </div>
   </div>
@@ -409,11 +492,10 @@
   </div>
   <div class="resume-box reveal">
     <h3>Full Resume</h3>
-    <p>An ATS-friendly overview of my experience, certifications, and technical skills. Download the full document or view it online.</p>
+    <p>3+ years of IT experience spanning help desk, network administration, and support leadership, backed by six active certifications. Download the full ATS-friendly resume detailing my experience, credentials, and technical skills.</p>
     <div class="contact-actions">
-      <a href="#" id="resume-link" class="btn btn-primary">Download Resume (PDF)</a>
+      <a href="files/resume.pdf" id="resume-link" class="btn btn-primary" target="_blank" rel="noopener" download>Download Resume (PDF)</a>
     </div>
-    <p style="margin-top:1.2rem;font-size:.78rem;color:var(--gray-light)">Tip: replace the link target with your hosted PDF URL.</p>
   </div>
 </section>
 
@@ -431,6 +513,7 @@
   <div class="copy-note" id="copy-note"></div>
   <div class="contact-actions reveal">
     <a href="mailto:ronnilehelser@gmail.com?subject=Reaching%20out%20from%20your%20portfolio" class="btn btn-primary">Email Me</a>
+    <a href="https://www.linkedin.com/in/ronnile-helser-3b1585251/" target="_blank" rel="noopener" class="btn btn-ghost">LinkedIn &#8599;</a>
     <button class="btn btn-ghost" id="copy-btn">Copy Address</button>
   </div>
 </section>
@@ -442,6 +525,21 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
   document.getElementById('year').textContent = new Date().getFullYear();
+
+  /* Intro overlay: hold briefly, then fade out and reveal the site */
+  (function(){
+    var intro = document.getElementById('intro');
+    if(!intro) return;
+    document.body.style.overflow = 'hidden';
+    window.setTimeout(function(){
+      intro.classList.add('hide');
+      document.body.style.overflow = '';
+    }, 3600);
+    // remove from DOM once faded so it can't trap clicks
+    intro.addEventListener('transitionend', function(){
+      if(intro.classList.contains('hide')){ intro.remove(); }
+    });
+  })();
 
   /* Mobile menu */
   var toggle = document.querySelector('.menu-toggle');
@@ -485,22 +583,25 @@
 
     // To show real certificate scans: host each PNG publicly and paste its URL into "img" below.
     var certs = [
-      {issuer:'CompTIA', cred:'Security+', meta:'Certified Jul 2023 · Valid through Jul 2026', bar:'#c8202f', url:'https://cp.certmetrics.com/comptia/en/public/verify/credential/62P8RX6SNEVE1B5T', img:''},
-      {issuer:'CompTIA', cred:'Network+', meta:'Certified Feb 2023 · Valid through Feb 2029', bar:'#c8202f', url:'https://cp.certmetrics.com/comptia/en/public/verify/credential/XFLGVEH5EJVQ1P91', img:''},
-      {issuer:'CompTIA', cred:'Server+', meta:'Certified Mar 2023', bar:'#c8202f', url:'https://cp.certmetrics.com/comptia/en/public/verify/credential/62P8RX6SNEVE1B5T', img:''},
-      {issuer:'CompTIA', cred:'A+', meta:'Certified Nov 2022 · Valid through Feb 2029', bar:'#c8202f', url:'https://cp.certmetrics.com/comptia/en/public/verify/credential/FPDEQRT5G2E1QLWQ', img:''},
-      {issuer:'Linux Professional Institute', cred:'Linux Essentials', meta:'Issued May 2023', bar:'#f0a500', url:'https://cs.lpi.org/caf/Xamman/certification/verify/LPI000563722/tdsktaa96u', img:''},
-      {issuer:'Python Institute', cred:'PCEP', meta:'Certified Jun 2026 · [PCEP-30-02]', bar:'#2b6cb0', url:'https://verify.openedg.org/?id=wMt2.VHgJ.aoh9', img:''}
+      {issuer:'CompTIA', cred:'Security+', meta:'Certified Jul 2023 · Valid through Jul 2026', bar:'#c8202f', url:'https://cp.certmetrics.com/comptia/en/public/verify/credential/62P8RX6SNEVE1B5T', img:'images/security-plus.png'},
+      {issuer:'CompTIA', cred:'Network+', meta:'Certified Feb 2023 · Valid through Feb 2029', bar:'#c8202f', url:'https://cp.certmetrics.com/comptia/en/public/verify/credential/XFLGVEH5EJVQ1P91', img:'images/network-plus.png'},
+      {issuer:'CompTIA', cred:'Server+', meta:'Certified Mar 2023', bar:'#c8202f', url:'https://cp.certmetrics.com/comptia/en/public/verify/credential/62P8RX6SNEVE1B5T', img:'images/server-plus.png'},
+      {issuer:'CompTIA', cred:'A+', meta:'Certified Nov 2022 · Valid through Feb 2029', bar:'#c8202f', url:'https://cp.certmetrics.com/comptia/en/public/verify/credential/FPDEQRT5G2E1QLWQ', img:'images/a-plus.png'},
+      {issuer:'Linux Professional Institute', cred:'Linux Essentials', meta:'Issued May 2023', bar:'#f0a500', url:'https://cs.lpi.org/caf/Xamman/certification/verify/LPI000563722/tdsktaa96u', img:'images/linux-essentials.png'},
+      {issuer:'Python Institute', cred:'PCEP', meta:'Certified Jun 2026 · [PCEP-30-02]', bar:'#2b6cb0', url:'https://verify.openedg.org/?id=wMt2.VHgJ.aoh9', img:'images/pcep.png'}
     ];
 
-    function imgBlock(c){
-      if(c.img){
-        return '<img class="cert-img" src="' + c.img + '" alt="' + c.issuer + ' ' + c.cred + ' certificate">';
-      }
-      // placeholder until a real image URL is provided
+    function placeholderHTML(c){
       return '<div class="cert-img" style="display:flex;align-items:center;justify-content:center;flex-direction:column;color:#b9b3a4;font-size:.7rem;letter-spacing:1px;text-transform:uppercase;text-align:center;padding:1rem">'
         + '<div style="font-size:1.6rem;color:' + c.bar + ';font-weight:800;letter-spacing:0;text-transform:none;margin-bottom:.3rem">' + c.cred + '</div>'
         + 'Certificate image<br>goes here</div>';
+    }
+
+    function imgBlock(c){
+      if(c.img){
+        return '<img class="cert-img" src="' + c.img + '" alt="' + c.issuer + ' ' + c.cred + ' certificate" data-cred="' + c.cred + '" data-bar="' + c.bar + '">';
+      }
+      return placeholderHTML(c);
     }
 
     function card(c){
@@ -516,6 +617,17 @@
 
     var html = certs.map(card).join('') + certs.map(card).join('');
     track.innerHTML = html;
+
+    // graceful fallback: if a certificate image can't load, show a styled placeholder
+    track.querySelectorAll('img.cert-img').forEach(function(img){
+      img.addEventListener('error', function(){
+        var ph = document.createElement('div');
+        ph.className = 'cert-img';
+        ph.style.cssText = 'display:flex;align-items:center;justify-content:center;flex-direction:column;color:#b9b3a4;font-size:.7rem;letter-spacing:1px;text-transform:uppercase;text-align:center;padding:1rem';
+        ph.innerHTML = '<div style="font-size:1.6rem;color:' + img.getAttribute('data-bar') + ';font-weight:800;letter-spacing:0;text-transform:none;margin-bottom:.3rem">' + img.getAttribute('data-cred') + '</div>Certificate image<br>goes here';
+        img.replaceWith(ph);
+      });
+    });
   })();
 
   /* Three.js animated hero background */
