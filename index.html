@@ -330,16 +330,6 @@
     padding:1rem .5rem;
     align-items:stretch;
   }
-  .cert-track.autoscroll{
-    animation:certscroll 40s linear infinite;
-  }
-  .cert-track.autoscroll.paused{
-    animation-play-state:paused;
-  }
-  @keyframes certscroll{
-    from{transform:translateX(0)}
-    to{transform:translateX(-50%)}
-  }
   .cert-plaque{
     flex:0 0 360px;
     width:360px;
@@ -598,7 +588,7 @@
     <div class="line"></div>
   </div>
   <div class="cert-carousel" id="cert-carousel">
-    <div class="cert-track autoscroll" id="cert-track">
+    <div class="cert-track" id="cert-track">
       <!-- cards injected by script (rendered twice for seamless loop) -->
     </div>
   </div>
@@ -923,41 +913,60 @@
       });
     });
 
-    /* ---- Drag / swipe / trackpad scrolling ---- */
+    /* ---- JS-driven auto-scroll + drag/swipe/trackpad, with timed resume ---- */
     var carousel = document.getElementById('cert-carousel');
     if(!carousel) return;
 
-    // switch from CSS auto-scroll to native scroll, preserving visual position
-    var switched = false;
-    function switchToManual(){
-      if(switched) return;
-      switched = true;
-      // freeze current transform position, then convert to scrollLeft
-      var style = window.getComputedStyle(track);
-      var matrix = new DOMMatrixReadOnly(style.transform);
-      var shift = Math.abs(matrix.m41) || 0;
-      track.classList.remove('autoscroll');
-      track.style.transform = 'none';
-      carousel.scrollLeft = shift;
-    }
-
-    // pause auto-scroll on hover (desktop) without committing to manual yet
-    carousel.addEventListener('mouseenter', function(){
-      if(!switched) track.classList.add('paused');
-    });
-    carousel.addEventListener('mouseleave', function(){
-      if(!switched) track.classList.remove('paused');
-    });
-
-    // pointer drag (mouse + touch + pen via Pointer Events)
+    var SPEED = 0.35;          // px per frame (~21px/sec at 60fps) - matches old ~40s loop feel
+    var RESUME_DELAY = 9000;   // ms of inactivity before auto-scroll resumes
+    var autoOn = true;         // is auto-scroll currently active
+    var resumeTimer = null;
     var isDown = false, startX = 0, startScroll = 0, moved = false;
 
+    // half width = one full set of cards (we render the set twice)
+    function halfWidth(){ return track.scrollWidth / 2; }
+
+    // keep scroll position within the first copy so the loop is seamless
+    function normalize(){
+      var hw = halfWidth();
+      if(hw <= 0) return;
+      if(carousel.scrollLeft >= hw){ carousel.scrollLeft -= hw; }
+      else if(carousel.scrollLeft < 0){ carousel.scrollLeft += hw; }
+    }
+
+    function tick(){
+      if(autoOn){
+        carousel.scrollLeft += SPEED;
+        normalize();
+      }
+      requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+
+    function pauseAuto(){
+      autoOn = false;
+      if(resumeTimer){ clearTimeout(resumeTimer); resumeTimer = null; }
+    }
+    function scheduleResume(){
+      if(resumeTimer){ clearTimeout(resumeTimer); }
+      resumeTimer = setTimeout(function(){ autoOn = true; }, RESUME_DELAY);
+    }
+
+    // hover pause (desktop): pause while hovering, resume on leave
+    carousel.addEventListener('mouseenter', function(){
+      if(!isDown){ autoOn = false; if(resumeTimer){ clearTimeout(resumeTimer); resumeTimer = null; } }
+    });
+    carousel.addEventListener('mouseleave', function(){
+      if(!isDown){ autoOn = true; }
+    });
+
+    // pointer drag (mouse + touch + pen)
     carousel.addEventListener('pointerdown', function(e){
-      switchToManual();
       isDown = true; moved = false;
       startX = e.clientX;
       startScroll = carousel.scrollLeft;
       carousel.classList.add('dragging');
+      pauseAuto();
       carousel.setPointerCapture(e.pointerId);
     });
     carousel.addEventListener('pointermove', function(e){
@@ -965,29 +974,32 @@
       var dx = e.clientX - startX;
       if(Math.abs(dx) > 4) moved = true;
       carousel.scrollLeft = startScroll - dx;
+      normalize();
     });
     function endDrag(e){
       if(!isDown) return;
       isDown = false;
       carousel.classList.remove('dragging');
       try { carousel.releasePointerCapture(e.pointerId); } catch(err){}
+      scheduleResume();   // resume auto-scroll after the delay
     }
     carousel.addEventListener('pointerup', endDrag);
     carousel.addEventListener('pointercancel', endDrag);
 
-    // prevent click-throughs (e.g. opening Verify link) right after a drag
+    // prevent click-throughs (e.g. Verify link) right after a drag
     carousel.addEventListener('click', function(e){
       if(moved){ e.preventDefault(); e.stopPropagation(); moved = false; }
     }, true);
 
     // trackpad / wheel horizontal scrolling
     carousel.addEventListener('wheel', function(e){
-      // honor horizontal intent, or translate vertical wheel into horizontal
       var delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
       if(delta !== 0){
-        switchToManual();
+        pauseAuto();
         carousel.scrollLeft += delta;
+        normalize();
         e.preventDefault();
+        scheduleResume();
       }
     }, {passive:false});
 
@@ -995,13 +1007,15 @@
     if(window.PointerEvent === undefined){
       var tStartX = 0, tStartScroll = 0;
       carousel.addEventListener('touchstart', function(e){
-        switchToManual();
+        pauseAuto();
         tStartX = e.touches[0].clientX;
         tStartScroll = carousel.scrollLeft;
       }, {passive:true});
       carousel.addEventListener('touchmove', function(e){
         carousel.scrollLeft = tStartScroll - (e.touches[0].clientX - tStartX);
+        normalize();
       }, {passive:true});
+      carousel.addEventListener('touchend', function(){ scheduleResume(); }, {passive:true});
     }
   })();
 
