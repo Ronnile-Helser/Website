@@ -391,6 +391,7 @@
   .contact-email:hover{color:var(--khaki)}
   .copy-note{font-size:.8rem;color:var(--gray-light);letter-spacing:1px;height:1rem}
   .contact-actions{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;margin-top:1.5rem}
+  .linkedin-badge{display:flex;justify-content:center;margin-top:2.5rem}
 
   footer{text-align:center;padding:2.5rem;color:var(--gray-light);font-size:.8rem;border-top:1px solid rgba(179,160,110,.12)}
   footer a{color:var(--khaki-light)}
@@ -679,6 +680,10 @@
     <a href="https://www.linkedin.com/in/ronnile-helser-3b1585251/" target="_blank" rel="noopener" class="btn btn-ghost">LinkedIn &#8599;</a>
     <button class="btn btn-ghost" id="copy-btn">Copy Address</button>
   </div>
+
+  <div class="linkedin-badge reveal">
+    <div class="badge-base LI-profile-badge" data-locale="en_US" data-size="medium" data-theme="dark" data-type="HORIZONTAL" data-vanity="ronnile-helser-3b1585251" data-version="v1"><a class="badge-base__link LI-simple-link" href="https://www.linkedin.com/in/ronnile-helser-3b1585251?trk=profile-badge">Ronnile Helser</a></div>
+  </div>
 </section>
 
 <footer>
@@ -770,6 +775,7 @@
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://platform.linkedin.com/badges/js/profile.js" async defer type="text/javascript"></script>
 <script>
   document.getElementById('year').textContent = new Date().getFullYear();
 
