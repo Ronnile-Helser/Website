@@ -112,8 +112,9 @@
   }
   .chat-header .avatar{
     width:38px;height:38px;border-radius:50%;
-    background:var(--charcoal);display:flex;align-items:center;justify-content:center;
-    border:1px solid var(--khaki-light);flex-shrink:0;
+    background:linear-gradient(150deg,var(--khaki),var(--khaki-dark));
+    display:flex;align-items:center;justify-content:center;
+    border:2px solid var(--khaki-light);flex-shrink:0;
   }
   .chat-header .avatar svg{width:26px;height:26px}
   .chat-header .who{flex-grow:1}
@@ -404,7 +405,6 @@
   .contact-email:hover{color:var(--khaki)}
   .copy-note{font-size:.8rem;color:var(--gray-light);letter-spacing:1px;height:1rem}
   .contact-actions{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;margin-top:1.5rem}
-  .linkedin-badge{display:flex;justify-content:center;margin-top:2.5rem}
 
   footer{text-align:center;padding:2.5rem;color:var(--gray-light);font-size:.8rem;border-top:1px solid rgba(179,160,110,.12)}
   footer a{color:var(--khaki-light)}
@@ -457,10 +457,11 @@
   .reveal{opacity:0;transform:translateY(30px);transition:opacity .7s ease,transform .7s ease}
   .reveal.visible{opacity:1;transform:none}
 
-  /* respect reduced-motion preference (decorative motion only) */
+  /* respect reduced-motion preference */
   @media (prefers-reduced-motion: reduce){
     html{scroll-behavior:auto}
     .reveal{opacity:1;transform:none;transition:none}
+    .cert-track{animation:none}
     .scroll-cue{animation:none}
     #chat-launcher .pulse{animation:none}
     .intro-bar,.intro-word,.intro-sub{animation-duration:.01s;animation-delay:0s}
@@ -702,10 +703,6 @@
     <a href="https://www.linkedin.com/in/ronnile-helser" target="_blank" rel="noopener" class="btn btn-ghost">LinkedIn &#8599;</a>
     <button class="btn btn-ghost" id="copy-btn">Copy Address</button>
   </div>
-
-  <div class="linkedin-badge reveal">
-    <div class="badge-base LI-profile-badge" data-locale="en_US" data-size="large" data-theme="dark" data-type="VERTICAL" data-vanity="ronnile-helser" data-version="v1"><a class="badge-base__link LI-simple-link" href="https://www.linkedin.com/in/ronnile-helser?trk=profile-badge">Ronnile Helser</a></div>
-  </div>
 </section>
 
 <footer>
@@ -767,20 +764,31 @@
   <div class="chat-header">
     <div class="avatar">
       <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M11.5 16 C9 9 10.5 4.5 13 4.5 C15.6 4.5 18.5 9.5 19.2 14.5 Z" fill="#d98e4a"/>
-        <path d="M36.5 16 C39 9 37.5 4.5 35 4.5 C32.4 4.5 29.5 9.5 28.8 14.5 Z" fill="#d98e4a"/>
+        <path d="M11.5 16 C9 9 10.5 4.5 13 4.5 C15.6 4.5 18.5 9.5 19.2 14.5 Z" fill="#d98e4a" stroke="#9a5a25" stroke-width="1.2" stroke-linejoin="round"/>
+        <path d="M36.5 16 C39 9 37.5 4.5 35 4.5 C32.4 4.5 29.5 9.5 28.8 14.5 Z" fill="#d98e4a" stroke="#9a5a25" stroke-width="1.2" stroke-linejoin="round"/>
         <path d="M13 13.5 C11.6 9.2 12.4 6.5 13.4 6.5 C14.6 6.5 16.2 10 16.7 13 Z" fill="#e8a9b0"/>
         <path d="M35 13.5 C36.4 9.2 35.6 6.5 34.6 6.5 C33.4 6.5 31.8 10 31.3 13 Z" fill="#e8a9b0"/>
-        <circle cx="24" cy="25" r="15" fill="#dd9450"/>
+        <path d="M12 7.5 C11.4 6 12.2 4.8 13 4.8 C13.9 4.8 14.7 5.8 15.1 7.2 C14 6.8 13 6.9 12 7.5 Z" fill="#fbf3e6"/>
+        <path d="M36 7.5 C36.6 6 35.8 4.8 35 4.8 C34.1 4.8 33.3 5.8 32.9 7.2 C34 6.8 35 6.9 36 7.5 Z" fill="#fbf3e6"/>
+        <circle cx="24" cy="25" r="15" fill="#dd9450" stroke="#9a5a25" stroke-width="1.4"/>
         <path d="M24 11 C25.6 14 25.8 18 25.4 22 L25.4 24 L22.6 24 L22.6 22 C22.2 18 22.4 14 24 11 Z" fill="#fbf3e6"/>
         <path d="M18.5 26 C18.5 30 20 36 24 36 C28 36 29.5 30 29.5 26 C29.5 25 28 24.5 24 24.5 C20 24.5 18.5 25 18.5 26 Z" fill="#fbf3e6"/>
-        <ellipse cx="18.7" cy="23" rx="2.3" ry="2.6" fill="#3a2412"/>
-        <ellipse cx="29.3" cy="23" rx="2.3" ry="2.6" fill="#3a2412"/>
-        <ellipse cx="24" cy="28" rx="2.5" ry="2" fill="#241a12"/>
+        <path d="M14 30 C15.5 34 19 37.5 24 38 C29 37.5 32.5 34 34 30 C30 31 27 31.5 24 31.5 C21 31.5 18 31 14 30 Z" fill="#fbf3e6"/>
+        <ellipse cx="18.7" cy="23" rx="2.4" ry="2.7" fill="#3a2412"/>
+        <ellipse cx="29.3" cy="23" rx="2.4" ry="2.7" fill="#3a2412"/>
+        <circle cx="19.6" cy="22" r=".8" fill="#fff"/>
+        <circle cx="30.2" cy="22" r=".8" fill="#fff"/>
+        <ellipse cx="24" cy="28" rx="2.6" ry="2.1" fill="#241a12"/>
+        <ellipse cx="23.3" cy="27.4" rx=".7" ry=".5" fill="#5a4636"/>
+        <path d="M19 30.5 C20.5 32.2 22 33 24 33 C26 33 27.5 32.2 29 30.5 C27.5 31.2 26 31.5 24 31.5 C22 31.5 20.5 31.2 19 30.5 Z" fill="#2b1d14"/>
         <path d="M22.2 31.4 C22.2 33.6 23 34.6 24 34.6 C25 34.6 25.8 33.6 25.8 31.4 C25.8 31.1 25 31 24 31 C23 31 22.2 31.1 22.2 31.4 Z" fill="#e8788a"/>
         <path d="M11 23 C11 14.5 16.5 9.5 24 9.5 C31.5 9.5 37 14.5 37 23" stroke="#3a7bd5" stroke-width="1.9" fill="none" stroke-linecap="round"/>
-        <circle cx="41" cy="32" r="1.7" fill="#5fe0c0"/>
+        <rect x="8.6" y="22" width="4.2" height="6.2" rx="1.8" fill="#3a7bd5"/>
         <path d="M37 25 L41 25 L41 31" stroke="#3a7bd5" stroke-width="1.9" fill="none" stroke-linecap="round"/>
+        <circle cx="41" cy="32" r="1.7" fill="#5fe0c0"/>
+        <circle cx="13.5" cy="8.5" r="1" fill="#5fe0c0"/>
+        <path d="M24 37.5 L22 39.4 L24 41 L26 39.4 Z" fill="#2b4f8a"/>
+        <path d="M22.7 41 L25.3 41 L26.4 46 L21.6 46 Z" fill="#3a7bd5" stroke="#2b4f8a" stroke-width=".6"/>
       </svg>
     </div>
     <div class="who">
@@ -797,7 +805,6 @@
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="https://platform.linkedin.com/badges/js/profile.js" async defer type="text/javascript"></script>
 <script>
   document.getElementById('year').textContent = new Date().getFullYear();
 
