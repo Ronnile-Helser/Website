@@ -622,12 +622,20 @@
     <div class="line"></div>
   </div>
   <div class="projects-grid">
-    <div class="project-card has-detail reveal" data-detail="prtg">
+    <div class="project-card reveal">
       <div class="tag">Network Monitoring</div>
       <h3>PRTG Network Monitor</h3>
-      <p>Deployed a PRTG monitoring server on my home network &mdash; configuring sensors to track my default gateway and key endpoints for uptime, latency, and availability, with live health dashboards.</p>
+      <p>Deployed a PRTG monitoring server on my home network &mdash; configuring sensors to track my default gateway and key endpoints for uptime, latency, and availability, with SMTP email alerting on state changes.</p>
       <div class="stack"><span>PRTG</span><span>SNMP</span><span>Monitoring</span></div>
-      <span class="detail-hint">View details &#8594;</span>
+      <button class="detail-toggle" type="button" data-target="prtg-panel" aria-expanded="false">View Details &#8595;</button>
+      <div class="detail-panel" id="prtg-panel">
+        <p>Deployed a Paessler PRTG monitoring server on my home network to gain hands-on experience with enterprise-grade network monitoring and observability. Configured sensors to continuously track my default gateway (router) and several key endpoints &mdash; monitoring uptime, latency, and availability across the network.</p>
+        <p>The live dashboard surfaces device health at a glance, grouping sensors by status so any outage or degradation is immediately visible. I configured SMTP email notifications to alert on state changes, so a downed device or threshold breach triggers an immediate notification rather than going unnoticed.</p>
+        <div class="img-ph">PRTG dashboard screenshot<br>images/prtg-dashboard.png</div>
+        <div class="caption">Live PRTG dashboard &mdash; sensor health overview across monitored devices.</div>
+        <p>This project reinforced core infrastructure skills that underpin security operations: understanding network telemetry, baselining normal behavior, configuring alerting thresholds, and building the kind of visibility that detection and incident response depend on.</p>
+        <div class="d-stack"><span>PRTG</span><span>SNMP</span><span>Network Monitoring</span><span>SMTP Alerting</span><span>Observability</span></div>
+      </div>
     </div>
     <div class="project-card reveal">
       <div class="tag">Digital Forensics</div>
@@ -715,15 +723,6 @@
 <footer>
   &copy; <span id="year"></span> Ronnile Helser &middot; IT &amp; Security
 </footer>
-
-<!-- PROJECT DETAIL MODAL -->
-<div id="proj-modal">
-  <div class="proj-modal-box">
-    <button class="proj-modal-close" id="proj-modal-close" aria-label="Close">&times;</button>
-    <div id="proj-modal-media"></div>
-    <div class="proj-modal-body" id="proj-modal-body"></div>
-  </div>
-</div>
 
 <!-- SCROLL TO TOP -->
 <button id="to-top" aria-label="Back to top">&uarr;</button>
@@ -824,69 +823,34 @@
 <script>
   document.getElementById('year').textContent = new Date().getFullYear();
 
-  /* Project detail modal */
+  /* Expandable project detail panels */
   (function(){
-    var modal = document.getElementById('proj-modal');
-    var media = document.getElementById('proj-modal-media');
-    var body = document.getElementById('proj-modal-body');
-    var closeBtn = document.getElementById('proj-modal-close');
-    if(!modal) return;
-
-    // detail content keyed by data-detail; add new entries here for future projects
-    var details = {
-      prtg: {
-        tag: 'Network Monitoring',
-        title: 'PRTG Network Monitor',
-        img: 'images/prtg-dashboard.png',
-        imgAlt: 'PRTG dashboard showing sensor health',
-        paras: [
-          'Deployed a Paessler PRTG monitoring server on my home network to gain hands-on experience with enterprise-grade network monitoring and observability.',
-          'Configured sensors to continuously track my default gateway (router) and several key endpoints, monitoring uptime, latency, and availability across the network. The live dashboard surfaces device health at a glance \u2014 grouping sensors by status so any outage or degradation is immediately visible, with SMTP email notifications configured to alert on state changes.',
-          'This project reinforced core infrastructure skills that underpin security operations: understanding network telemetry, baselining normal network behavior, configuring alerting thresholds, and building the kind of visibility that detection and incident response depend on.'
-        ],
-        stack: ['PRTG','SNMP','Network Monitoring','SMTP Alerting','Observability']
-      }
-    };
-
-    function openModal(key){
-      var d = details[key];
-      if(!d) return;
-
-      // media: image with graceful placeholder fallback
-      if(d.img){
-        var img = new Image();
-        img.className = 'proj-modal-img';
-        img.alt = d.imgAlt || d.title;
-        img.onerror = function(){
-          media.innerHTML = '<div class="proj-modal-img-ph"><strong style="color:var(--khaki);font-size:1.1rem;letter-spacing:0;text-transform:none">' + d.title + '</strong>Screenshot coming soon</div>';
-        };
-        img.onload = function(){ media.innerHTML = ''; media.appendChild(img); };
-        img.src = d.img;
-        // show placeholder immediately in case load is slow
-        media.innerHTML = '<div class="proj-modal-img-ph"><strong style="color:var(--khaki);font-size:1.1rem;letter-spacing:0;text-transform:none">' + d.title + '</strong>Loading\u2026</div>';
-      } else {
-        media.innerHTML = '';
-      }
-
-      var html = '<div class="tag">' + d.tag + '</div><h3>' + d.title + '</h3>';
-      d.paras.forEach(function(p){ html += '<p>' + p + '</p>'; });
-      html += '<div class="stack">' + d.stack.map(function(s){ return '<span>' + s + '</span>'; }).join('') + '</div>';
-      body.innerHTML = html;
-
-      modal.classList.add('open');
-      document.body.style.overflow = 'hidden';
-    }
-    function closeModal(){
-      modal.classList.remove('open');
-      document.body.style.overflow = '';
-    }
-
-    document.querySelectorAll('.project-card.has-detail').forEach(function(card){
-      card.addEventListener('click', function(){ openModal(card.getAttribute('data-detail')); });
+    var toggles = document.querySelectorAll('.detail-toggle');
+    toggles.forEach(function(btn){
+      btn.addEventListener('click', function(e){
+        e.preventDefault();
+        var panel = document.getElementById(btn.getAttribute('data-target'));
+        if(!panel) return;
+        var isOpen = panel.classList.toggle('open');
+        btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        btn.innerHTML = isOpen ? 'Hide Details &#8593;' : 'View Details &#8595;';
+      });
     });
-    closeBtn.addEventListener('click', closeModal);
-    modal.addEventListener('click', function(e){ if(e.target === modal){ closeModal(); } });
-    document.addEventListener('keydown', function(e){ if(e.key === 'Escape' && modal.classList.contains('open')){ closeModal(); } });
+
+    document.querySelectorAll('.detail-panel').forEach(function(panel){
+      var ph = panel.querySelector('.img-ph');
+      if(!ph) return;
+      var m = ph.textContent.match(/images\/[^\s<]+/);
+      if(!m) return;
+      var img = new Image();
+      img.onload = function(){
+        var real = document.createElement('img');
+        real.src = img.src;
+        real.alt = 'Project screenshot';
+        ph.replaceWith(real);
+      };
+      img.src = m[0].trim();
+    });
   })();
 
   /* Scroll progress bar */
