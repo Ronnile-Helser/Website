@@ -4,6 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ronnile Helser — IT &amp; Security</title>
+<script>
+  try {
+    if (sessionStorage.getItem('introSeen') === '1') {
+      document.documentElement.className += ' no-intro';
+    }
+  } catch(e){}
+</script>
 <meta name="description" content="Ronnile 'Ronnie' Helser — CompTIA-certified IT professional in Columbus, OH. Tier 2 IT Service Analyst and cybersecurity instructor with 3+ years of experience, six certifications, and hands-on home lab projects.">
 <meta name="author" content="Ronnile Helser">
 <meta property="og:title" content="Ronnile Helser — IT &amp; Security">
@@ -163,6 +170,7 @@
     transition:opacity 1.6s ease;
   }
   #intro.hide{opacity:0;pointer-events:none}
+  html.no-intro #intro{display:none}
   .intro-inner{
     text-align:center;
     padding:0 2rem;
@@ -889,10 +897,21 @@
     nums.forEach(function(n){ obs.observe(n); });
   })();
 
-  /* Intro overlay: hold briefly, then fade out and reveal the site */
+  /* Intro overlay: plays once per browsing session, then stays out of the way */
   (function(){
     var intro = document.getElementById('intro');
     if(!intro) return;
+
+    var seen = false;
+    try { seen = sessionStorage.getItem('introSeen') === '1'; } catch(e){}
+
+    if(seen){
+      intro.remove();
+      return;
+    }
+
+    try { sessionStorage.setItem('introSeen', '1'); } catch(e){}
+
     document.body.style.overflow = 'hidden';
     window.setTimeout(function(){
       intro.classList.add('hide');
