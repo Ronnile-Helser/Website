@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PRTG Network Monitor — Ronnile Helser</title>
+<meta name="description" content="Project deep dive: deploying and configuring a PRTG network monitoring server, by Ronnile Helser.">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%231a1c20'/%3E%3Ctext x='32' y='44' font-family='Segoe UI,Arial,sans-serif' font-size='30' font-weight='700' fill='%23b3a06e' text-anchor='middle'%3ERH%3C/text%3E%3C/svg%3E">
+<style>
+  :root{
+    --khaki:#b3a06e;
+    --khaki-light:#cbbd96;
+    --khaki-dark:#8a7a4f;
+    --gray:#6b7177;
+    --gray-light:#9aa1a8;
+    --charcoal:#23262b;
+    --charcoal-soft:#2e3238;
+    --bg:#1a1c20;
+    --text:#e8e6e0;
+    --text-dim:#a8a8a2;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  ::selection{background:var(--khaki);color:var(--charcoal)}
+  a:focus-visible,button:focus-visible{outline:2px solid var(--khaki);outline-offset:3px;border-radius:4px}
+  body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
+  a{color:inherit;text-decoration:none}
+
+  nav{
+    position:sticky;top:0;z-index:100;
+    display:flex;justify-content:space-between;align-items:center;
+    padding:1rem 2.5rem;
+    background:rgba(26,28,32,.85);backdrop-filter:blur(12px);
+    border-bottom:1px solid rgba(179,160,110,.15);
+  }
+  nav .brand{font-weight:700;letter-spacing:.5px;color:var(--khaki)}
+  .back-link{
+    font-size:.8rem;letter-spacing:1px;text-transform:uppercase;
+    color:var(--khaki-light);display:flex;align-items:center;gap:.5rem;
+    transition:color .2s;
+  }
+  .back-link:hover{color:var(--khaki)}
+
+  main{max-width:840px;margin:0 auto;padding:4rem 2.5rem 6rem}
+
+  .breadcrumb{color:var(--khaki);font-size:.78rem;letter-spacing:2px;text-transform:uppercase;margin-bottom:1rem}
+  h1{font-size:clamp(2rem,5vw,3rem);font-weight:800;letter-spacing:-.5px;margin-bottom:.8rem}
+  .meta-row{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:2.2rem}
+  .meta-row span{
+    font-size:.72rem;letter-spacing:1px;padding:.35rem .75rem;
+    background:rgba(179,160,110,.08);border:1px solid rgba(179,160,110,.35);
+    border-radius:30px;color:var(--khaki-light);text-transform:uppercase;
+  }
+  .lede{font-size:1.15rem;color:var(--text-dim);margin-bottom:2.5rem;max-width:680px}
+
+  .shot{
+    width:100%;border-radius:12px;display:block;margin-bottom:.6rem;
+    border:1px solid rgba(179,160,110,.25);box-shadow:0 20px 50px rgba(0,0,0,.45);
+  }
+  .shot-ph{
+    width:100%;aspect-ratio:16/9;border-radius:12px;margin-bottom:.6rem;
+    display:flex;align-items:center;justify-content:center;flex-direction:column;gap:.4rem;
+    background:linear-gradient(150deg,var(--charcoal-soft),var(--charcoal));
+    border:1px solid rgba(179,160,110,.2);color:var(--gray-light);
+    font-size:.85rem;letter-spacing:1px;text-transform:uppercase;text-align:center;padding:1rem;
+  }
+  .caption{font-size:.8rem;color:var(--gray-light);font-style:italic;margin-bottom:2.5rem}
+
+  h2{font-size:1.1rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--khaki);margin:2.5rem 0 1rem}
+  p{color:var(--text-dim);font-size:1.05rem;line-height:1.75;margin-bottom:1.3rem;max-width:720px}
+
+  .stack-row{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:2.5rem}
+  .stack-row span{font-size:.78rem;padding:.35rem .8rem;background:rgba(107,113,119,.25);border-radius:5px;color:var(--text)}
+
+  .cta-row{display:flex;gap:1rem;flex-wrap:wrap;margin-top:3rem;padding-top:2.5rem;border-top:1px solid rgba(179,160,110,.15)}
+  .btn{
+    padding:.8rem 1.6rem;border-radius:6px;font-size:.82rem;
+    letter-spacing:1px;text-transform:uppercase;cursor:pointer;
+    transition:all .25s;border:1px solid var(--khaki);display:inline-block;
+  }
+  .btn-primary{background:var(--khaki);color:var(--charcoal);font-weight:600}
+  .btn-primary:hover{background:var(--khaki-light);transform:translateY(-2px)}
+  .btn-ghost{background:transparent;color:var(--khaki-light)}
+  .btn-ghost:hover{background:rgba(179,160,110,.1);transform:translateY(-2px)}
+
+  footer{text-align:center;padding:2.5rem;color:var(--gray-light);font-size:.8rem;border-top:1px solid rgba(179,160,110,.12)}
+
+  @media(max-width:640px){
+    nav{padding:1rem 1.3rem}
+    main{padding:2.5rem 1.3rem 4rem}
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="brand">RH</div>
+  <a class="back-link" href="../index.html">&#8592; Back to Portfolio</a>
+</nav>
+
+<main>
+  <div class="breadcrumb">Home Lab &amp; Projects &middot; Network Monitoring</div>
+  <h1>PRTG Network Monitor</h1>
+  <div class="meta-row">
+    <span>PRTG</span><span>SNMP</span><span>Network Monitoring</span><span>SMTP Alerting</span><span>Observability</span>
+  </div>
+  <p class="lede">A home lab deployment of Paessler PRTG to monitor my home router and key endpoints &mdash; built to gain hands-on experience with the kind of visibility and alerting that real network and security operations depend on.</p>
+
+  <!-- SCREENSHOT: replace src below with images/prtg-dashboard.png once uploaded -->
+  <img class="shot" src="../images/prtg-dashboard.png" alt="PRTG dashboard showing sensor health overview" onerror="this.outerHTML='<div class=&quot;shot-ph&quot;><strong style=&quot;color:var(--khaki);font-size:1.1rem;letter-spacing:0;text-transform:none&quot;>Dashboard Screenshot</strong>Place your image at images/prtg-dashboard.png</div>'">
+  <div class="caption">Live PRTG dashboard &mdash; sensor health overview across monitored devices.</div>
+
+  <h2>What I Built</h2>
+  <p>I deployed a Paessler PRTG monitoring server on my home network to get real, hands-on experience with the kind of network observability tooling used in enterprise IT and security operations. I configured sensors to continuously track my home router along with several key endpoints on the network, monitoring uptime, latency, and general availability. The live dashboard groups every sensor by status &mdash; up, down, or warning &mdash; so the overall health of the network is visible at a glance rather than something I have to dig for.</p>
+  <p>On top of basic monitoring, I configured SMTP email alerting so that a downed device or a threshold breach triggers an immediate notification instead of going unnoticed until I happen to check the dashboard. That was an important step for me &mdash; it's the difference between a dashboard you have to babysit and a system that actually notifies you when something needs attention, which is the whole point of monitoring in a real environment.</p>
+
+  <h2>What I Learned</h2>
+  <p>This project sharpened skills that sit right at the foundation of security operations: understanding how devices report health over the network, learning to baseline what "normal" looks like so that deviations actually stand out, and configuring alert thresholds that are meaningful rather than noisy. It also gave me a much better appreciation for why monitoring and detection are so closely linked &mdash; you can't detect an anomaly if you don't already know what normal behavior is, and PRTG forced me to build that baseline myself instead of reading about it.</p>
+
+  <h2>Challenges &amp; Pivots</h2>
+  <p>Getting alerting configured correctly took more trial and error than I expected. My first attempt at SMTP notifications didn't fire reliably, which pushed me to go back through PRTG's notification trigger settings more carefully and understand exactly how sensor states, thresholds, and escalation are separated in the platform rather than assuming a single "on/off" alert would cover everything. It was a good reminder that a monitoring tool is only as useful as its configuration &mdash; getting sensors reporting is the easy part, tuning them to alert meaningfully is where the real work is.</p>
+
+  <div class="stack-row">
+    <span>PRTG</span><span>SNMP</span><span>Network Monitoring</span><span>SMTP Alerting</span><span>Sensor Configuration</span><span>Observability</span>
+  </div>
+
+  <div class="cta-row">
+    <a href="../index.html#projects" class="btn btn-primary">&#8592; Back to All Projects</a>
+    <a href="../index.html#contact" class="btn btn-ghost">Get in Touch</a>
+  </div>
+</main>
+
+<footer>
+  &copy; <span id="year"></span> Ronnile Helser &middot; IT &amp; Security
+</footer>
+
+<script>
+  document.getElementById('year').textContent = new Date().getFullYear();
+</script>
+</body>
+</html>
