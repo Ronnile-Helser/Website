@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rhino Hunt CTF — Ronnile Helser</title>
+<meta name="description" content="Project deep dive: the DFRWS 2005 Rhino Hunt digital forensics challenge, by Ronnile Helser.">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%231a1c20'/%3E%3Ctext x='32' y='44' font-family='Segoe UI,Arial,sans-serif' font-size='30' font-weight='700' fill='%23b3a06e' text-anchor='middle'%3ERH%3C/text%3E%3C/svg%3E">
+<style>
+  :root{
+    --khaki:#b3a06e;
+    --khaki-light:#cbbd96;
+    --khaki-dark:#8a7a4f;
+    --gray:#6b7177;
+    --gray-light:#9aa1a8;
+    --charcoal:#23262b;
+    --charcoal-soft:#2e3238;
+    --bg:#1a1c20;
+    --text:#e8e6e0;
+    --text-dim:#a8a8a2;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  ::selection{background:var(--khaki);color:var(--charcoal)}
+  a:focus-visible,button:focus-visible{outline:2px solid var(--khaki);outline-offset:3px;border-radius:4px}
+  body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
+  a{color:inherit;text-decoration:none}
+
+  nav{
+    position:sticky;top:0;z-index:100;
+    display:flex;justify-content:space-between;align-items:center;
+    padding:1rem 2.5rem;
+    background:rgba(26,28,32,.85);backdrop-filter:blur(12px);
+    border-bottom:1px solid rgba(179,160,110,.15);
+  }
+  nav .brand{font-weight:700;letter-spacing:.5px;color:var(--khaki);cursor:pointer;transition:color .2s,transform .2s;display:inline-block}
+  nav .brand:hover{color:var(--khaki-light);transform:translateY(-1px)}
+  .back-link{
+    font-size:.8rem;letter-spacing:1px;text-transform:uppercase;
+    color:var(--khaki-light);display:flex;align-items:center;gap:.5rem;
+    transition:color .2s;
+  }
+  .back-link:hover{color:var(--khaki)}
+
+  main{max-width:840px;margin:0 auto;padding:4rem 2.5rem 6rem}
+
+  .breadcrumb{color:var(--khaki);font-size:.78rem;letter-spacing:2px;text-transform:uppercase;margin-bottom:1rem}
+  h1{font-size:clamp(2rem,5vw,3rem);font-weight:800;letter-spacing:-.5px;margin-bottom:.8rem}
+  .meta-row{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:2.2rem}
+  .meta-row span{
+    font-size:.72rem;letter-spacing:1px;padding:.35rem .75rem;
+    background:rgba(179,160,110,.08);border:1px solid rgba(179,160,110,.35);
+    border-radius:30px;color:var(--khaki-light);text-transform:uppercase;
+  }
+  .lede{font-size:1.15rem;color:var(--text-dim);margin-bottom:2.5rem;max-width:680px}
+
+  .case-file{
+    background:linear-gradient(150deg,var(--charcoal-soft),var(--charcoal));
+    border:1px solid rgba(179,160,110,.25);border-left:3px solid var(--khaki);
+    border-radius:10px;padding:1.8rem 2rem;margin-bottom:1rem;
+    box-shadow:0 20px 50px rgba(0,0,0,.35);
+  }
+  .case-file .file-label{
+    font-size:.7rem;letter-spacing:2px;text-transform:uppercase;
+    color:var(--khaki);margin-bottom:1rem;
+    display:flex;align-items:center;gap:.7rem;
+  }
+  .case-file .file-label::after{content:'';flex:1;height:1px;background:rgba(179,160,110,.2)}
+  .case-file p{font-size:1rem;margin-bottom:1rem}
+  .case-file p:last-child{margin-bottom:0}
+
+  .evidence-grid{
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+    gap:.8rem;margin:1.4rem 0 .4rem;
+  }
+  .evidence-grid div{
+    background:rgba(26,28,32,.6);border:1px solid rgba(179,160,110,.18);
+    border-radius:6px;padding:.8rem 1rem;
+  }
+  .evidence-grid strong{
+    display:block;color:var(--khaki-light);font-size:.82rem;
+    font-family:'Consolas','Courier New',monospace;font-weight:600;margin-bottom:.2rem;
+  }
+  .evidence-grid span{color:var(--gray-light);font-size:.8rem}
+
+  .q-list{list-style:none;margin:.4rem 0 0;counter-reset:q}
+  .q-list li{
+    counter-increment:q;position:relative;padding:.5rem 0 .5rem 2.4rem;
+    color:var(--text-dim);font-size:.98rem;line-height:1.6;
+  }
+  .q-list li::before{
+    content:counter(q,decimal-leading-zero);position:absolute;left:0;top:.5rem;
+    color:var(--khaki);font-size:.75rem;font-family:'Consolas','Courier New',monospace;
+    letter-spacing:1px;opacity:.75;
+  }
+  .caption{font-size:.8rem;color:var(--gray-light);font-style:italic;margin-bottom:2.5rem}
+
+  h2{font-size:1.1rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--khaki);margin:2.5rem 0 1rem}
+  p{color:var(--text-dim);font-size:1.05rem;line-height:1.75;margin-bottom:1.3rem;max-width:720px}
+
+  .find-list{list-style:none;margin:0 0 1.5rem;max-width:720px}
+  .find-list li{
+    color:var(--text-dim);font-size:1rem;line-height:1.7;
+    padding:.55rem 0 .55rem 1.4rem;position:relative;
+    border-bottom:1px solid rgba(179,160,110,.1);
+  }
+  .find-list li:last-child{border-bottom:none}
+  .find-list li::before{
+    content:'';position:absolute;left:0;top:1.15rem;
+    width:6px;height:6px;border-radius:50%;background:var(--khaki);
+  }
+
+  .stack-row{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:2.5rem}
+  .stack-row span{font-size:.78rem;padding:.35rem .8rem;background:rgba(107,113,119,.25);border-radius:5px;color:var(--text)}
+
+  .report-box{
+    margin-top:3rem;padding:2rem;text-align:center;
+    background:linear-gradient(150deg,var(--charcoal-soft),var(--charcoal));
+    border:1px solid rgba(179,160,110,.25);border-radius:12px;
+  }
+  .report-box h3{font-size:1.35rem;margin-bottom:.5rem;color:var(--text)}
+  .report-box p{color:var(--text-dim);margin:0 auto 1.5rem;max-width:520px;font-size:.98rem}
+
+  .cta-row{display:flex;gap:1rem;flex-wrap:wrap;margin-top:3rem;padding-top:2.5rem;border-top:1px solid rgba(179,160,110,.15)}
+  .btn{
+    padding:.8rem 1.6rem;border-radius:6px;font-size:.82rem;
+    letter-spacing:1px;text-transform:uppercase;cursor:pointer;
+    transition:all .25s;border:1px solid var(--khaki);display:inline-block;
+  }
+  .btn-primary{background:var(--khaki);color:var(--charcoal);font-weight:600}
+  .btn-primary:hover{background:var(--khaki-light);transform:translateY(-2px)}
+  .btn-ghost{background:transparent;color:var(--khaki-light)}
+  .btn-ghost:hover{background:rgba(179,160,110,.1);transform:translateY(-2px)}
+
+  footer{text-align:center;padding:2.5rem;color:var(--gray-light);font-size:.8rem;border-top:1px solid rgba(179,160,110,.12)}
+
+  @media(max-width:640px){
+    nav{padding:1rem 1.3rem}
+    main{padding:2.5rem 1.3rem 4rem}
+    .report-box{padding:1.5rem 1.2rem}
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="brand" href="../index.html" aria-label="Back to portfolio">RH</a>
+  <a class="back-link" href="../index.html">&#8592; Back to Portfolio</a>
+</nav>
+
+<main>
+  <div class="breadcrumb">Home Lab &amp; Projects &middot; Digital Forensics</div>
+  <h1>Rhino Hunt CTF</h1>
+  <div class="meta-row">
+    <span>Digital Forensics</span><span>Packet Analysis</span><span>File Carving</span><span>Steganography</span><span>Password Cracking</span>
+  </div>
+  <p class="lede">A full examination of the DFRWS 2005 "Rhino Hunt" evidence set: a USB key disk image and three packet captures, worked end to end on Kali Linux to reconstruct how a suspect gained access, what moved across the wire, and what was hidden on the drive.</p>
+
+  <h2>About the Challenge</h2>
+  <p>Rhino Hunt is a public digital forensics exercise published by NIST in its Computer Forensic Reference Data Sets collection. The evidence was contributed by Dr. Golden G. Richard III and was originally run as the DFRWS 2005 Rodeo Challenge. It has been used for training and coursework ever since, which makes it a common benchmark: the answers are documented, so the work can be checked rather than taken on faith.</p>
+  <p>The premise is deliberately absurd, and that is the point. Swapping contraband for rhinoceros photographs keeps the exercise free of anything genuinely objectionable while leaving the investigative problem completely intact. The evidence handling, the carving, the packet analysis, and the correlation work are identical to what a real case would demand.</p>
+
+  <div class="case-file">
+    <div class="file-label">Case File &middot; DFRWS 2005 Rodeo Challenge</div>
+    <p>New Orleans passes a law in 2004 making possession of nine or more unique rhinoceros images a serious crime. A network administrator at the University of New Orleans notices illegal rhino traffic on his monitoring system and calls the police.</p>
+    <p>Investigators seize a computer and a USB key from one of the university labs. The computer arrives with no hard drive in it. The USB key is imaged, and the administrator hands over three packet captures involving the same machine. The suspect is the lab's primary user, a doctoral candidate who has been at the university since 1972.</p>
+
+    <div class="evidence-grid">
+      <div><strong>RHINOUSB.dd</strong><span>Raw image of the seized USB key</span></div>
+      <div><strong>rhino.log</strong><span>Network capture, trace 1</span></div>
+      <div><strong>rhino2.log</strong><span>Network capture, trace 2</span></div>
+      <div><strong>rhino3.log</strong><span>Network capture, trace 3</span></div>
+    </div>
+  </div>
+  <div class="caption">Scenario adapted from the <a href="https://cfreds-archive.nist.gov/dfrws/Rhino_Hunt.html" target="_blank" rel="noopener" style="color:var(--khaki-light);border-bottom:1px solid rgba(179,160,110,.4)">NIST CFReDS Rhino Hunt data set</a>, originally the DFRWS 2005 Rodeo Challenge.</div>
+
+  <h2>The Task</h2>
+  <p>Recover at least nine rhino images from the evidence, document them in a report, and answer as many of the following as the evidence supports:</p>
+  <ol class="q-list">
+    <li>Who gave the accused a telnet/FTP account?</li>
+    <li>What are the username and password for that account?</li>
+    <li>What relevant file transfers appear in the network traces?</li>
+    <li>What happened to the computer's hard drive, and where is it now?</li>
+    <li>What happened to the USB key?</li>
+    <li>What is recoverable from the dd image of the USB key?</li>
+    <li>Is there any evidence connecting the USB key to the network traces?</li>
+  </ol>
+  <p>No file listing, no timeline, no starting point. Just four files and seven questions, which is a fair approximation of how a real examination begins.</p>
+
+  <h2>What I Did</h2>
+  <p>The Rhino Hunt scenario centers on a city employee suspected of trafficking rhinoceros images. The evidence provided is a dd image of a USB key that has been reformatted, plus three packet captures taken from the network. The task is to answer a set of investigative questions using nothing but that evidence.</p>
+  <p>I worked the disk image in Autopsy 2.x, reading recoverable text at the data unit level to surface the suspect's own account of what happened, and ran Foremost against the raw image to carve out files that the reformat left behind. On the network side I used Wireshark to follow TCP streams across all three captures, pulling exported objects out of FTP-DATA and HTTP transfers and tracing a reference to an executable that appeared in IMAP traffic before the file itself turned up in a separate HTTP packet.</p>
+  <p>Two pieces required cracking rather than carving. A zip archive recovered from an FTP transfer was password protected, so I ran it through John the Ripper. Separately, two alligator images pulled off the USB key turned out to be carriers for hidden rhino images embedded with jphide, which I extracted with jpseek once I worked out the passphrase.</p>
+
+  <h2>My Findings</h2>
+  <ul class="find-list">
+    <li>The suspect was given a gnome account by a colleague, admitted in plain ASCII text recoverable from the disk image.</li>
+    <li>Credentials for that account crossed the wire in cleartext and were readable straight out of the TCP stream.</li>
+    <li>Six rhino images moved across the network over FTP and HTTP, one of them wrapped inside a password-protected archive.</li>
+    <li>The USB key was reformatted with a downloaded utility that was itself first referenced in IMAP traffic, then recovered from an HTTP packet.</li>
+    <li>An image carved from the USB key matched one exported from the network capture, tying the physical device directly to the observed traffic.</li>
+    <li>Files that looked like throwaway noise on the drive turned out to be the key to the hidden data.</li>
+  </ul>
+  <p>Every one of these came out of my own examination of the evidence. My full write-up below records where each finding came from, down to the packet and data unit, so the work can be followed and checked rather than taken at my word.</p>
+
+  <h2>What I Learned</h2>
+  <p>The single biggest takeaway was that reformatting a drive destroys almost nothing. The file system metadata goes away, but the underlying blocks sit there untouched until something overwrites them, which is exactly why carving works. Reading that in a textbook and watching Foremost pull intact JPEGs out of a "wiped" image are two very different experiences.</p>
+  <p>The other lesson was about correlation. Any one artifact in this challenge is suggestive on its own but not conclusive. The case only holds together because a file carved from the drive is byte for byte the same as a file exported from a capture. That habit of pinning one source of evidence against an independent one is the part that transfers directly to detection and incident response work.</p>
+  <p>It also drove home how much unencrypted protocols give away. Watching an FTP login appear in a stream in plaintext, with no effort required, makes a better argument for encryption in transit than any policy document.</p>
+
+  <h2>Challenges &amp; Pivots</h2>
+  <p>Steganography was where I lost the most time. Detecting that an image is carrying hidden data is one problem, and extracting it is a second, harder one that needs the right tool matched to the right embedding method. I spent a long stretch working through a Docker-based stego toolkit against the carved JPEGs before landing on jphide as the method actually in use.</p>
+  <p>The passphrase was its own detour. There were several gumbo recipe files sitting on the drive that read like filler, and I treated them that way at first. They were the hint. Once I stopped sorting evidence into "relevant" and "irrelevant" before I understood the case, the passphrase was sitting in plain sight. That is a mistake I would rather make in a practice scenario than a real one.</p>
+
+  <div class="stack-row">
+    <span>Kali Linux</span><span>Autopsy 2.x</span><span>Wireshark</span><span>Foremost</span><span>John the Ripper</span><span>jphide / jpseek</span><span>Docker</span>
+  </div>
+
+  <div class="report-box">
+    <h3>My Examination Report</h3>
+    <p>The report I wrote at the end of this project: my findings, the exhibits I recovered, and the specific packets and data units each of my conclusions came from. My own analysis and my own write-up, not the published answer key.</p>
+    <a href="../files/rhino-hunt-report.pdf" class="btn btn-primary" target="_blank" rel="noopener" download>Download My Report (PDF)</a>
+  </div>
+
+  <div class="cta-row">
+    <a href="../index.html#projects" class="btn btn-primary">&#8592; Back to All Projects</a>
+    <a href="../index.html#contact" class="btn btn-ghost">Get in Touch</a>
+  </div>
+</main>
+
+<footer>
+  &copy; <span id="year"></span> Ronnile Helser &middot; IT &amp; Security
+</footer>
+
+<script>
+  document.getElementById('year').textContent = new Date().getFullYear();
+</script>
+</body>
+</html>
