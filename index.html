@@ -216,7 +216,8 @@
     backdrop-filter:blur(12px);
     border-bottom:1px solid rgba(179,160,110,.15);
   }
-  nav .brand{font-weight:700;letter-spacing:.5px;color:var(--khaki)}
+  nav .brand{font-weight:700;letter-spacing:.5px;color:var(--khaki);cursor:pointer;transition:color .2s,transform .2s;display:inline-block}
+  nav .brand:hover{color:var(--khaki-light);transform:translateY(-1px)}
   nav .links{display:flex;gap:1.8rem}
   nav .links a{
     font-size:.85rem;letter-spacing:1px;text-transform:uppercase;
@@ -513,7 +514,7 @@
 </div>
 
 <nav>
-  <div class="brand">RH</div>
+  <a class="brand" href="#hero" aria-label="Back to top">RH</a>
   <button class="menu-toggle" aria-label="Menu">&#9776;</button>
   <div class="links">
     <a href="#about">About</a>
@@ -649,6 +650,7 @@
       <h3>Rhino Hunt CTF</h3>
       <p>Completed the Rhino Hunt forensics challenge &mdash; recovering deleted files, carving data from disk and network captures, and reconstructing evidence to solve the scenario.</p>
       <div class="stack"><span>Forensics</span><span>Data Carving</span><span>CTF</span></div>
+      <a href="projects/rhino-hunt.html" class="card-link">View Details &#8594;</a>
     </div>
     <div class="project-card reveal">
       <div class="tag">Identity &amp; Infrastructure</div>
