@@ -11,7 +11,7 @@
     }
   } catch(e){}
 </script>
-<meta name="description" content="Ronnile 'Ronnie' Helser — CompTIA-certified IT professional in Columbus, OH. Tier 2 IT Service Analyst and cybersecurity instructor with 3+ years of experience, six certifications, and hands-on home lab projects.">
+<meta name="description" content="Ronnile 'Ronnie' Helser — CompTIA-certified IT professional in Columbus, OH. Tier 2 IT Service Analyst and cybersecurity instructor with 3+ years of experience, seven certifications, and hands-on home lab projects.">
 <meta name="author" content="Ronnile Helser">
 <meta property="og:title" content="Ronnile Helser — IT &amp; Security">
 <meta property="og:description" content="CompTIA-certified IT professional. Tier 2 IT Service Analyst, cybersecurity instructor, and hands-on home lab builder — Columbus, OH.">
@@ -343,9 +343,12 @@
     position:relative;
     height:440px;
     overflow:hidden;
-    -webkit-mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent);
-    mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent);
   }
+  .cert-carousel::before,.cert-carousel::after{
+    content:'';position:absolute;top:0;bottom:0;width:80px;z-index:3;pointer-events:none;
+  }
+  .cert-carousel::before{left:0;background:linear-gradient(90deg,var(--bg),transparent)}
+  .cert-carousel::after{right:0;background:linear-gradient(270deg,var(--bg),transparent)}
   .cert-track{
     display:flex;
     gap:1.5rem;
@@ -380,13 +383,8 @@
     background:var(--accent-bar,#b3a06e);
   }
   .cert-img{
-    width:100%;
-    aspect-ratio:4/3;
-    object-fit:cover;
-    object-position:top;
-    display:block;
-    background:#fff;
-    border-bottom:1px solid rgba(138,122,79,.2);
+    width:100%;aspect-ratio:4/3;object-fit:cover;object-position:top;display:block;
+    background:#fff;border-bottom:1px solid rgba(138,122,79,.2);
   }
   .cert-body{padding:1.2rem 1.4rem 1.4rem;display:flex;flex-direction:column;flex-grow:1}
   .cert-plaque .issuer{font-size:.68rem;letter-spacing:2px;text-transform:uppercase;color:var(--khaki-dark);font-weight:700}
@@ -396,8 +394,7 @@
     display:inline-block;font-size:.74rem;letter-spacing:1px;text-transform:uppercase;
     font-weight:700;color:var(--khaki-dark);
     border:1.5px solid var(--khaki-dark);border-radius:6px;
-    padding:.45rem .9rem;text-align:center;transition:all .2s;
-    align-self:flex-start;
+    padding:.45rem .9rem;text-align:center;transition:all .2s;align-self:flex-start;
   }
   .cert-plaque .verify:hover{background:var(--khaki-dark);color:#fbfaf6}
   .cert-hint{text-align:center;color:var(--gray-light);font-size:.78rem;letter-spacing:1px;margin-top:2rem}
@@ -544,6 +541,7 @@
       <a href="https://cp.certmetrics.com/comptia/en/public/verify/credential/FPDEQRT5G2E1QLWQ" target="_blank" rel="noopener"><span>A+ &#8599;</span></a>
       <a href="https://cs.lpi.org/caf/Xamman/certification/verify/LPI000563722/tdsktaa96u" target="_blank" rel="noopener"><span>Linux Essentials &#8599;</span></a>
       <a href="https://verify.openedg.org/?id=wMt2.VHgJ.aoh9" target="_blank" rel="noopener"><span>PCEP &#8599;</span></a>
+      <a href="https://learn.microsoft.com/api/credentials/share/en-us/RonnileHelser-9652/312213EF8C6268CF?sharingId=4587B96022CB3526" target="_blank" rel="noopener"><span>Azure AI Fundamentals &#8599;</span></a>
     </div>
     <div class="hero-cta reveal">
       <a href="#projects" class="btn btn-primary">View Projects</a>
@@ -575,13 +573,14 @@
         <span>Windows Server</span><span>Wireshark</span><span>PRTG</span>
         <span>Jira</span><span>SharePoint</span><span>Intune / MDM</span>
         <span>Python</span><span>MITRE ATT&amp;CK</span>
+        <span>Artificial Intelligence</span><span>Machine Learning</span><span>Microsoft Foundry</span>
         <span>Network Admin</span><span>Endpoint Security</span><span>Incident Triage</span>
       </div>
     </div>
   </div>
   <div class="stats-band">
     <div class="stat reveal"><div class="num" data-count="3" data-suffix="+">0</div><div class="label">Years Experience</div></div>
-    <div class="stat reveal"><div class="num" data-count="6">0</div><div class="label">Certifications</div></div>
+    <div class="stat reveal"><div class="num" data-count="7">0</div><div class="label">Certifications</div></div>
     <div class="stat reveal"><div class="num" data-count="50" data-suffix="+">0</div><div class="label">Programs Supported</div></div>
   </div>
 </section>
@@ -706,7 +705,7 @@
   </div>
   <div class="resume-box reveal">
     <h3>Full Resume</h3>
-    <p>3+ years of IT experience spanning help desk, network administration, and support leadership, backed by six active certifications. Download the full ATS-friendly resume detailing my experience, credentials, and technical skills.</p>
+    <p>3+ years of IT experience spanning help desk, network administration, and support leadership, backed by seven active certifications. Download the full ATS-friendly resume detailing my experience, credentials, and technical skills.</p>
     <div class="contact-actions">
       <a href="files/resume.pdf" id="resume-link" class="btn btn-primary" target="_blank" rel="noopener" download>Download Resume (PDF)</a>
       <a href="files/resume.docx" id="resume-docx-link" class="btn btn-ghost" download>Download Resume (DOCX)</a>
@@ -904,6 +903,61 @@
     nums.forEach(function(n){ obs.observe(n); });
   })();
 
+  /* Build certification carousel */
+  (function(){
+    var track = document.getElementById('cert-track');
+    if(!track) return;
+
+    // To show real certificate scans: host each PNG publicly and paste its URL into "img" below.
+    var certs = [
+      {issuer:'CompTIA', cred:'Security+', meta:'Certified Jul 2023 · Valid through Jul 2026', bar:'#c8202f', url:'https://cp.certmetrics.com/comptia/en/public/verify/credential/62P8RX6SNEVE1B5T', img:'images/security-plus.png'},
+      {issuer:'CompTIA', cred:'Network+', meta:'Certified Feb 2023 · Valid through Feb 2029', bar:'#c8202f', url:'https://cp.certmetrics.com/comptia/en/public/verify/credential/XFLGVEH5EJVQ1P91', img:'images/network-plus.png'},
+      {issuer:'CompTIA', cred:'Server+', meta:'Certified Mar 2023', bar:'#c8202f', url:'https://cp.certmetrics.com/comptia/en/public/verify/credential/62P8RX6SNEVE1B5T', img:'images/server-plus.png'},
+      {issuer:'CompTIA', cred:'A+', meta:'Certified Nov 2022 · Valid through Feb 2029', bar:'#c8202f', url:'https://cp.certmetrics.com/comptia/en/public/verify/credential/FPDEQRT5G2E1QLWQ', img:'images/a-plus.png'},
+      {issuer:'Linux Professional Institute', cred:'Linux Essentials', meta:'Issued May 2023', bar:'#f0a500', url:'https://cs.lpi.org/caf/Xamman/certification/verify/LPI000563722/tdsktaa96u', img:'images/linux-essentials.png'},
+      {issuer:'Python Institute', cred:'PCEP', meta:'Certified Jun 2026 · [PCEP-30-02]', bar:'#2b6cb0', url:'https://verify.openedg.org/?id=wMt2.VHgJ.aoh9', img:'images/pcep.png'},
+      {issuer:'Microsoft', cred:'Azure AI Fundamentals', meta:'Certified Jul 2026 · [AI-901]', bar:'#0078d4', url:'https://learn.microsoft.com/api/credentials/share/en-us/RonnileHelser-9652/312213EF8C6268CF?sharingId=4587B96022CB3526', img:'images/ai-901.png'}
+    ];
+
+    function placeholderHTML(c){
+      return '<div class="cert-img" style="display:flex;align-items:center;justify-content:center;flex-direction:column;color:#b9b3a4;font-size:.7rem;letter-spacing:1px;text-transform:uppercase;text-align:center;padding:1rem">'
+        + '<div style="font-size:1.6rem;color:' + c.bar + ';font-weight:800;letter-spacing:0;text-transform:none;margin-bottom:.3rem">' + c.cred + '</div>'
+        + 'Certificate image<br>goes here</div>';
+    }
+
+    function imgBlock(c){
+      if(c.img){
+        return '<img class="cert-img" src="' + c.img + '" loading="lazy" alt="' + c.issuer + ' ' + c.cred + ' certificate" data-cred="' + c.cred + '" data-bar="' + c.bar + '">';
+      }
+      return placeholderHTML(c);
+    }
+
+    function card(c){
+      return '<div class="cert-plaque" style="--accent-bar:' + c.bar + '">'
+        + imgBlock(c)
+        + '<div class="cert-body">'
+        + '<div class="issuer">' + c.issuer + '</div>'
+        + '<div class="cred">' + c.cred + '</div>'
+        + '<div class="meta">' + c.meta + '</div>'
+        + '<a class="verify" href="' + c.url + '" target="_blank" rel="noopener">Verify ↗</a>'
+        + '</div></div>';
+    }
+
+    var html = certs.map(card).join('') + certs.map(card).join('');
+    track.innerHTML = html;
+
+    // graceful fallback: if a certificate image can't load, show a styled placeholder
+    track.querySelectorAll('img.cert-img').forEach(function(img){
+      img.addEventListener('error', function(){
+        var ph = document.createElement('div');
+        ph.className = 'cert-img';
+        ph.style.cssText = 'display:flex;align-items:center;justify-content:center;flex-direction:column;color:#b9b3a4;font-size:.7rem;letter-spacing:1px;text-transform:uppercase;text-align:center;padding:1rem';
+        ph.innerHTML = '<div style="font-size:1.6rem;color:' + img.getAttribute('data-bar') + ';font-weight:800;letter-spacing:0;text-transform:none;margin-bottom:.3rem">' + img.getAttribute('data-cred') + '</div>Certificate image<br>goes here';
+        img.replaceWith(ph);
+      });
+    });
+  })();
+
   /* Intro overlay: plays once per browsing session, then stays out of the way */
   (function(){
     var intro = document.getElementById('intro');
@@ -1056,164 +1110,6 @@
     card.addEventListener('mouseleave', function(){ card.style.transform=''; });
   });
 
-  /* Build certification carousel */
-  (function(){
-    var track = document.getElementById('cert-track');
-    if(!track) return;
-
-    // To show real certificate scans: host each PNG publicly and paste its URL into "img" below.
-    var certs = [
-      {issuer:'CompTIA', cred:'Security+', meta:'Certified Jul 2023 · Valid through Jul 2026', bar:'#c8202f', url:'https://cp.certmetrics.com/comptia/en/public/verify/credential/62P8RX6SNEVE1B5T', img:'images/security-plus.png'},
-      {issuer:'CompTIA', cred:'Network+', meta:'Certified Feb 2023 · Valid through Feb 2029', bar:'#c8202f', url:'https://cp.certmetrics.com/comptia/en/public/verify/credential/XFLGVEH5EJVQ1P91', img:'images/network-plus.png'},
-      {issuer:'CompTIA', cred:'Server+', meta:'Certified Mar 2023', bar:'#c8202f', url:'https://cp.certmetrics.com/comptia/en/public/verify/credential/62P8RX6SNEVE1B5T', img:'images/server-plus.png'},
-      {issuer:'CompTIA', cred:'A+', meta:'Certified Nov 2022 · Valid through Feb 2029', bar:'#c8202f', url:'https://cp.certmetrics.com/comptia/en/public/verify/credential/FPDEQRT5G2E1QLWQ', img:'images/a-plus.png'},
-      {issuer:'Linux Professional Institute', cred:'Linux Essentials', meta:'Issued May 2023', bar:'#f0a500', url:'https://cs.lpi.org/caf/Xamman/certification/verify/LPI000563722/tdsktaa96u', img:'images/linux-essentials.png'},
-      {issuer:'Python Institute', cred:'PCEP', meta:'Certified Jun 2026 · [PCEP-30-02]', bar:'#2b6cb0', url:'https://verify.openedg.org/?id=wMt2.VHgJ.aoh9', img:'images/pcep.png'}
-    ];
-
-    function placeholderHTML(c){
-      return '<div class="cert-img" style="display:flex;align-items:center;justify-content:center;flex-direction:column;color:#b9b3a4;font-size:.7rem;letter-spacing:1px;text-transform:uppercase;text-align:center;padding:1rem">'
-        + '<div style="font-size:1.6rem;color:' + c.bar + ';font-weight:800;letter-spacing:0;text-transform:none;margin-bottom:.3rem">' + c.cred + '</div>'
-        + 'Certificate image<br>goes here</div>';
-    }
-
-    function imgBlock(c){
-      if(c.img){
-        return '<img class="cert-img" src="' + c.img + '" loading="lazy" alt="' + c.issuer + ' ' + c.cred + ' certificate" data-cred="' + c.cred + '" data-bar="' + c.bar + '">';
-      }
-      return placeholderHTML(c);
-    }
-
-    function card(c){
-      return '<div class="cert-plaque" style="--accent-bar:' + c.bar + '">'
-        + imgBlock(c)
-        + '<div class="cert-body">'
-        + '<div class="issuer">' + c.issuer + '</div>'
-        + '<div class="cred">' + c.cred + '</div>'
-        + '<div class="meta">' + c.meta + '</div>'
-        + '<a class="verify" href="' + c.url + '" target="_blank" rel="noopener">Verify ↗</a>'
-        + '</div></div>';
-    }
-
-    var html = certs.map(card).join('') + certs.map(card).join('');
-    track.innerHTML = html;
-
-    // graceful fallback: if a certificate image can't load, show a styled placeholder
-    track.querySelectorAll('img.cert-img').forEach(function(img){
-      img.addEventListener('error', function(){
-        var ph = document.createElement('div');
-        ph.className = 'cert-img';
-        ph.style.cssText = 'display:flex;align-items:center;justify-content:center;flex-direction:column;color:#b9b3a4;font-size:.7rem;letter-spacing:1px;text-transform:uppercase;text-align:center;padding:1rem';
-        ph.innerHTML = '<div style="font-size:1.6rem;color:' + img.getAttribute('data-bar') + ';font-weight:800;letter-spacing:0;text-transform:none;margin-bottom:.3rem">' + img.getAttribute('data-cred') + '</div>Certificate image<br>goes here';
-        img.replaceWith(ph);
-      });
-    });
-
-    /* ---- JS-driven auto-scroll + drag/swipe/trackpad, with timed resume ---- */
-    var carousel = document.getElementById('cert-carousel');
-    if(!carousel) return;
-
-    var SPEED = 0.35;          // px per frame (~21px/sec at 60fps) - matches old ~40s loop feel
-    var RESUME_DELAY = 9000;   // ms of inactivity before auto-scroll resumes
-    var autoOn = true;         // is auto-scroll currently active
-    var resumeTimer = null;
-    var isDown = false, startX = 0, startScroll = 0, moved = false;
-
-    // half width = one full set of cards (we render the set twice)
-    function halfWidth(){ return track.scrollWidth / 2; }
-
-    // keep scroll position within the first copy so the loop is seamless
-    function normalize(){
-      var hw = halfWidth();
-      if(hw <= 0) return;
-      if(carousel.scrollLeft >= hw){ carousel.scrollLeft -= hw; }
-      else if(carousel.scrollLeft < 0){ carousel.scrollLeft += hw; }
-    }
-
-    function tick(){
-      if(autoOn){
-        carousel.scrollLeft += SPEED;
-        normalize();
-      }
-      requestAnimationFrame(tick);
-    }
-    requestAnimationFrame(tick);
-
-    function pauseAuto(){
-      autoOn = false;
-      if(resumeTimer){ clearTimeout(resumeTimer); resumeTimer = null; }
-    }
-    function scheduleResume(){
-      if(resumeTimer){ clearTimeout(resumeTimer); }
-      resumeTimer = setTimeout(function(){ autoOn = true; }, RESUME_DELAY);
-    }
-
-    // hover pause (desktop): pause while hovering, resume on leave
-    carousel.addEventListener('mouseenter', function(){
-      if(!isDown){ autoOn = false; if(resumeTimer){ clearTimeout(resumeTimer); resumeTimer = null; } }
-    });
-    carousel.addEventListener('mouseleave', function(){
-      if(!isDown){ autoOn = true; }
-    });
-
-    // pointer drag (mouse + touch + pen)
-    carousel.addEventListener('pointerdown', function(e){
-      isDown = true; moved = false;
-      startX = e.clientX;
-      startScroll = carousel.scrollLeft;
-      carousel.classList.add('dragging');
-      pauseAuto();
-      carousel.setPointerCapture(e.pointerId);
-    });
-    carousel.addEventListener('pointermove', function(e){
-      if(!isDown) return;
-      var dx = e.clientX - startX;
-      if(Math.abs(dx) > 4) moved = true;
-      carousel.scrollLeft = startScroll - dx;
-      normalize();
-    });
-    function endDrag(e){
-      if(!isDown) return;
-      isDown = false;
-      carousel.classList.remove('dragging');
-      try { carousel.releasePointerCapture(e.pointerId); } catch(err){}
-      scheduleResume();   // resume auto-scroll after the delay
-    }
-    carousel.addEventListener('pointerup', endDrag);
-    carousel.addEventListener('pointercancel', endDrag);
-
-    // prevent click-throughs (e.g. Verify link) right after a drag
-    carousel.addEventListener('click', function(e){
-      if(moved){ e.preventDefault(); e.stopPropagation(); moved = false; }
-    }, true);
-
-    // trackpad / wheel horizontal scrolling
-    carousel.addEventListener('wheel', function(e){
-      var delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
-      if(delta !== 0){
-        pauseAuto();
-        carousel.scrollLeft += delta;
-        normalize();
-        e.preventDefault();
-        scheduleResume();
-      }
-    }, {passive:false});
-
-    // touch fallback for older browsers without pointer events
-    if(window.PointerEvent === undefined){
-      var tStartX = 0, tStartScroll = 0;
-      carousel.addEventListener('touchstart', function(e){
-        pauseAuto();
-        tStartX = e.touches[0].clientX;
-        tStartScroll = carousel.scrollLeft;
-      }, {passive:true});
-      carousel.addEventListener('touchmove', function(e){
-        carousel.scrollLeft = tStartScroll - (e.touches[0].clientX - tStartX);
-        normalize();
-      }, {passive:true});
-      carousel.addEventListener('touchend', function(){ scheduleResume(); }, {passive:true});
-    }
-  })();
 
   /* Three.js animated hero background */
   (function(){
