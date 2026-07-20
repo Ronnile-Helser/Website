@@ -337,67 +337,48 @@
   }
   .card-link:hover{background:var(--khaki);color:var(--charcoal);font-weight:600}
 
-  /* CERT CAROUSEL */
-  #certs{max-width:1200px}
-  .cert-carousel{
-    position:relative;
-    height:440px;
-    overflow:hidden;
-  }
-  .cert-carousel::before,.cert-carousel::after{
-    content:'';position:absolute;top:0;bottom:0;width:80px;z-index:3;pointer-events:none;
-  }
-  .cert-carousel::before{left:0;background:linear-gradient(90deg,var(--bg),transparent)}
-  .cert-carousel::after{right:0;background:linear-gradient(270deg,var(--bg),transparent)}
-  .cert-track{
-    display:flex;
-    gap:1.5rem;
-    width:max-content;
-    height:100%;
-    align-items:center;
-    padding:1rem 0;
-    animation:certscroll 40s linear infinite;
-  }
-  .cert-carousel:hover .cert-track{animation-play-state:paused}
-  @keyframes certscroll{
-    from{transform:translateX(0)}
-    to{transform:translateX(-50%)}
-  }
-  .cert-plaque{
-    flex:0 0 360px;
-    width:360px;
+  /* CERT COVERFLOW — manual, index-driven, infinite via modulo (no scroll/animation loop to freeze) */
+  #certs{max-width:1100px}
+  .coverflow{position:relative;height:400px;display:flex;align-items:center;justify-content:center}
+  .cf-stage{position:relative;width:100%;height:100%}
+  .cf-card{
+    position:absolute;top:50%;left:50%;
+    width:260px;height:340px;margin:-170px 0 0 -130px;
     background:linear-gradient(150deg,#fbfaf6,#e9e4d6);
-    border-radius:14px;
-    box-shadow:0 14px 40px rgba(0,0,0,.45);
-    border:1px solid rgba(138,122,79,.35);
-    display:flex;
-    flex-direction:column;
-    color:var(--charcoal);
-    position:relative;
-    overflow:hidden;
-    transition:transform .3s,box-shadow .3s;
+    border-radius:16px;border:1px solid rgba(138,122,79,.35);
+    box-shadow:0 20px 50px rgba(0,0,0,.5);color:var(--charcoal);
+    overflow:hidden;display:flex;flex-direction:column;
+    transition:transform 2.125s cubic-bezier(.65,0,.35,1), opacity 1.625s ease-out, filter 1.625s ease-out;
+    will-change:transform;
   }
-  .cert-plaque:hover{transform:translateY(-8px);box-shadow:0 22px 50px rgba(0,0,0,.55)}
-  .cert-plaque::before{
-    content:'';position:absolute;top:0;left:0;right:0;height:8px;z-index:2;
-    background:var(--accent-bar,#b3a06e);
+  .cf-card .accent-bar{position:absolute;top:0;left:0;right:0;height:6px;z-index:2}
+  .cf-media{width:100%;aspect-ratio:4/3;background:#fff;overflow:hidden;border-bottom:1px solid rgba(138,122,79,.2)}
+  .cf-media img{width:100%;height:100%;object-fit:cover;object-position:top;display:block;pointer-events:none;user-select:none}
+  .cf-ph{width:100%;height:100%;display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:1rem;background:#fbfaf6;color:#b9b3a4;font-size:.6rem;letter-spacing:1px;text-transform:uppercase}
+  .cf-ph .ph-cred{font-size:1.05rem;font-weight:800;letter-spacing:0;text-transform:none;margin-bottom:.25rem}
+  .cf-body{padding:.85rem 1.05rem 1.05rem;flex-grow:1;display:flex;flex-direction:column}
+  .cf-issuer{font-size:.6rem;letter-spacing:1.4px;text-transform:uppercase;color:var(--khaki-dark);font-weight:700}
+  .cf-cred{font-size:1rem;font-weight:800;margin:.22rem 0;color:#1f2227}
+  .cf-meta{font-size:.64rem;color:#6c6f63;margin-bottom:.55rem}
+  .cf-verify{margin-top:auto;font-size:.66rem;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--khaki-dark);opacity:0;transition:opacity .3s ease}
+  .cf-card.is-active .cf-verify{opacity:1}
+  .cf-card:not(.is-active){cursor:pointer}
+
+  .cf-nav{display:flex;justify-content:center;align-items:center;gap:1.3rem;margin-top:1.5rem}
+  .cf-btn{width:44px;height:44px;border-radius:50%;border:1px solid var(--khaki);background:transparent;color:var(--khaki-light);cursor:pointer;font-size:1.05rem;display:flex;align-items:center;justify-content:center;transition:all .2s}
+  .cf-btn:hover{background:var(--khaki);color:var(--charcoal);transform:translateY(-2px)}
+  .cf-btn:active{transform:scale(.94);transition:transform .1s ease}
+  .cf-dots{display:flex;gap:.4rem}
+  .cf-dot{width:6px;height:6px;border-radius:50%;background:rgba(179,160,110,.3);transition:all .3s ease;cursor:pointer}
+  .cf-dot.active{background:var(--khaki);width:18px;border-radius:4px}
+
+  @media (prefers-reduced-motion: reduce){
+    .cf-card{transition:opacity .3s ease}
   }
-  .cert-img{
-    width:100%;aspect-ratio:4/3;object-fit:cover;object-position:top;display:block;
-    background:#fff;border-bottom:1px solid rgba(138,122,79,.2);
+  @media(max-width:640px){
+    .cf-card{width:210px;height:290px;margin:-150px 0 0 -105px}
+    .coverflow{height:340px}
   }
-  .cert-body{padding:1.2rem 1.4rem 1.4rem;display:flex;flex-direction:column;flex-grow:1}
-  .cert-plaque .issuer{font-size:.68rem;letter-spacing:2px;text-transform:uppercase;color:var(--khaki-dark);font-weight:700}
-  .cert-plaque .cred{font-size:1.35rem;font-weight:800;line-height:1.1;margin:.35rem 0;color:#1f2227}
-  .cert-plaque .meta{font-size:.72rem;color:#6c6f63;line-height:1.5;margin-bottom:.9rem;flex-grow:1}
-  .cert-plaque .verify{
-    display:inline-block;font-size:.74rem;letter-spacing:1px;text-transform:uppercase;
-    font-weight:700;color:var(--khaki-dark);
-    border:1.5px solid var(--khaki-dark);border-radius:6px;
-    padding:.45rem .9rem;text-align:center;transition:all .2s;align-self:flex-start;
-  }
-  .cert-plaque .verify:hover{background:var(--khaki-dark);color:#fbfaf6}
-  .cert-hint{text-align:center;color:var(--gray-light);font-size:.78rem;letter-spacing:1px;margin-top:2rem}
 
   /* RESUME */
   #resume .resume-box{
@@ -477,7 +458,7 @@
   @media (prefers-reduced-motion: reduce){
     html{scroll-behavior:auto}
     .reveal{opacity:1;transform:none;transition:none}
-    .cert-track{animation:none}
+    /* cert coverflow only animates on click, already covered by .cf-card's own reduced-motion rule above */
     .scroll-cue{animation:none}
     #chat-launcher .pulse{animation:none}
     .intro-bar,.intro-word,.intro-sub{animation-duration:.01s;animation-delay:0s}
@@ -688,12 +669,14 @@
     <h2>Verified Credentials</h2>
     <div class="line"></div>
   </div>
-  <div class="cert-carousel">
-    <div class="cert-track" id="cert-track">
-      <!-- cards injected by script (rendered twice for seamless loop) -->
-    </div>
+  <div class="coverflow">
+    <div class="cf-stage" id="cert-stage"></div>
   </div>
-  <div class="cert-hint">Auto-scrolling &middot; hover to pause</div>
+  <div class="cf-nav">
+    <button class="cf-btn" id="cert-prev" aria-label="Previous certification">&#8592;</button>
+    <div class="cf-dots" id="cert-dots"></div>
+    <button class="cf-btn" id="cert-next" aria-label="Next certification">&#8594;</button>
+  </div>
 </section>
 
 <!-- RESUME -->
@@ -903,10 +886,13 @@
     nums.forEach(function(n){ obs.observe(n); });
   })();
 
-  /* Build certification carousel */
+  /* Certification coverflow: manual navigation only, "infinite" via index
+     modulo (no duplicated content, no scroll math, nothing to freeze).
+     Animates only on click/keypress — never runs on a timer. */
   (function(){
-    var track = document.getElementById('cert-track');
-    if(!track) return;
+    var stage = document.getElementById('cert-stage');
+    var dotsWrap = document.getElementById('cert-dots');
+    if(!stage || !dotsWrap) return;
 
     // To show real certificate scans: host each PNG publicly and paste its URL into "img" below.
     var certs = [
@@ -918,44 +904,94 @@
       {issuer:'Python Institute', cred:'PCEP', meta:'Certified Jun 2026 · [PCEP-30-02]', bar:'#2b6cb0', url:'https://verify.openedg.org/?id=wMt2.VHgJ.aoh9', img:'images/pcep.png'},
       {issuer:'Microsoft', cred:'Azure AI Fundamentals', meta:'Certified Jul 2026 · [AI-901]', bar:'#0078d4', url:'https://learn.microsoft.com/api/credentials/share/en-us/RonnileHelser-9652/312213EF8C6268CF?sharingId=4587B96022CB3526', img:'images/ai-901.png'}
     ];
+    var N = certs.length;
+    var current = 0;
 
-    function placeholderHTML(c){
-      return '<div class="cert-img" style="display:flex;align-items:center;justify-content:center;flex-direction:column;color:#b9b3a4;font-size:.7rem;letter-spacing:1px;text-transform:uppercase;text-align:center;padding:1rem">'
-        + '<div style="font-size:1.6rem;color:' + c.bar + ';font-weight:800;letter-spacing:0;text-transform:none;margin-bottom:.3rem">' + c.cred + '</div>'
-        + 'Certificate image<br>goes here</div>';
+    certs.forEach(function(c, i){
+      var card = document.createElement('a');
+      card.className = 'cf-card';
+      card.href = c.url; card.target = '_blank'; card.rel = 'noopener';
+      card.innerHTML =
+        '<div class="accent-bar" style="background:' + c.bar + '"></div>' +
+        '<div class="cf-media"><img src="' + c.img + '" loading="lazy" alt="' + c.issuer + ' ' + c.cred + ' certificate" data-cred="' + c.cred + '" data-bar="' + c.bar + '"></div>' +
+        '<div class="cf-body">' +
+          '<div class="cf-issuer">' + c.issuer + '</div>' +
+          '<div class="cf-cred">' + c.cred + '</div>' +
+          '<div class="cf-meta">' + c.meta + '</div>' +
+          '<span class="cf-verify">Verify &#8599;</span>' +
+        '</div>';
+      card.addEventListener('click', function(e){
+        if(i !== current){ e.preventDefault(); goTo(i); }
+      });
+      stage.appendChild(card);
+
+      var dot = document.createElement('div');
+      dot.className = 'cf-dot';
+      dot.addEventListener('click', function(){ goTo(i); });
+      dotsWrap.appendChild(dot);
+    });
+
+    var cardEls = Array.prototype.slice.call(stage.children);
+    var dotEls = Array.prototype.slice.call(dotsWrap.children);
+
+    function shortestDelta(from, to, n){
+      var raw = (to - from) % n;
+      if(raw > n/2) raw -= n;
+      if(raw < -n/2) raw += n;
+      return raw;
     }
 
-    function imgBlock(c){
-      if(c.img){
-        return '<img class="cert-img" src="' + c.img + '" loading="lazy" alt="' + c.issuer + ' ' + c.cred + ' certificate" data-cred="' + c.cred + '" data-bar="' + c.bar + '">';
-      }
-      return placeholderHTML(c);
+    function render(){
+      cardEls.forEach(function(card, i){
+        var delta = shortestDelta(current, i, N);
+        var abs = Math.abs(delta);
+        var x = delta * 190;
+        var scale = abs === 0 ? 1 : 0.82;
+        var opacity = abs === 0 ? 1 : (abs === 1 ? 0.6 : (abs === 2 ? 0.22 : 0));
+        var blur = abs === 0 ? 0 : (abs === 1 ? 0 : 1.5);
+        var z = 100 - abs;
+        card.style.transform = 'translateX(' + x + 'px) scale(' + scale + ')';
+        card.style.opacity = opacity;
+        card.style.filter = blur ? 'blur(' + blur + 'px)' : 'none';
+        card.style.zIndex = z;
+        card.style.pointerEvents = abs > 1 ? 'none' : 'auto';
+        card.classList.toggle('is-active', delta === 0);
+      });
+      dotEls.forEach(function(d, i){ d.classList.toggle('active', i === current); });
     }
 
-    function card(c){
-      return '<div class="cert-plaque" style="--accent-bar:' + c.bar + '">'
-        + imgBlock(c)
-        + '<div class="cert-body">'
-        + '<div class="issuer">' + c.issuer + '</div>'
-        + '<div class="cred">' + c.cred + '</div>'
-        + '<div class="meta">' + c.meta + '</div>'
-        + '<a class="verify" href="' + c.url + '" target="_blank" rel="noopener">Verify ↗</a>'
-        + '</div></div>';
+    function goTo(i){
+      current = ((i % N) + N) % N;   // true modulo — the entire "infinite loop" is this one line
+      render();
     }
 
-    var html = certs.map(card).join('') + certs.map(card).join('');
-    track.innerHTML = html;
+    document.getElementById('cert-prev').addEventListener('click', function(){ goTo(current - 1); });
+    document.getElementById('cert-next').addEventListener('click', function(){ goTo(current + 1); });
+
+    // arrow keys navigate too, since it's already index-driven — only active while the
+    // carousel is in view, so it doesn't hijack arrow keys used elsewhere on the page
+    var certsSection = document.getElementById('certs');
+    var inView = false;
+    new IntersectionObserver(function(entries){
+      entries.forEach(function(e){ inView = e.isIntersecting; });
+    }, {threshold:.3}).observe(certsSection);
+    document.addEventListener('keydown', function(e){
+      if(!inView) return;
+      if(e.key === 'ArrowRight') goTo(current + 1);
+      if(e.key === 'ArrowLeft') goTo(current - 1);
+    });
 
     // graceful fallback: if a certificate image can't load, show a styled placeholder
-    track.querySelectorAll('img.cert-img').forEach(function(img){
-      img.addEventListener('error', function(){
-        var ph = document.createElement('div');
-        ph.className = 'cert-img';
-        ph.style.cssText = 'display:flex;align-items:center;justify-content:center;flex-direction:column;color:#b9b3a4;font-size:.7rem;letter-spacing:1px;text-transform:uppercase;text-align:center;padding:1rem';
-        ph.innerHTML = '<div style="font-size:1.6rem;color:' + img.getAttribute('data-bar') + ';font-weight:800;letter-spacing:0;text-transform:none;margin-bottom:.3rem">' + img.getAttribute('data-cred') + '</div>Certificate image<br>goes here';
-        img.replaceWith(ph);
-      });
-    });
+    stage.addEventListener('error', function(e){
+      var img = e.target;
+      if(!img || img.tagName !== 'IMG' || !img.closest('.cf-media')) return;
+      var ph = document.createElement('div');
+      ph.className = 'cf-ph';
+      ph.innerHTML = '<div class="ph-cred" style="color:' + img.getAttribute('data-bar') + '">' + img.getAttribute('data-cred') + '</div>Certificate image<br>goes here';
+      img.replaceWith(ph);
+    }, true);
+
+    render();
   })();
 
   /* Intro overlay: plays once per browsing session, then stays out of the way */
