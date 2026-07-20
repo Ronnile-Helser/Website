@@ -348,12 +348,11 @@
   }
   .cert-track{
     display:flex;
-    gap:1.5rem;
     width:max-content;
     height:100%;
     align-items:center;
     padding:1rem 0;
-    animation:certscroll 40s linear infinite;
+    animation:certscroll 44s linear infinite;
   }
   .cert-carousel:hover .cert-track{animation-play-state:paused}
   @keyframes certscroll{
@@ -363,6 +362,7 @@
   .cert-plaque{
     flex:0 0 360px;
     width:360px;
+    margin-right:1.5rem;
     background:linear-gradient(150deg,#fbfaf6,#e9e4d6);
     border-radius:14px;
     box-shadow:0 14px 40px rgba(0,0,0,.45);
@@ -1118,7 +1118,8 @@
 
     var SPEED = 0.35;          // px per frame (~21px/sec at 60fps) - matches old ~40s loop feel
     var RESUME_DELAY = 9000;   // ms of inactivity before auto-scroll resumes
-    var autoOn = true;         // is auto-scroll currently active
+    var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var autoOn = !reduceMotion; // is auto-scroll currently active (off if user prefers reduced motion)
     var resumeTimer = null;
     var isDown = false, startX = 0, startScroll = 0, moved = false;
 
@@ -1147,6 +1148,7 @@
       if(resumeTimer){ clearTimeout(resumeTimer); resumeTimer = null; }
     }
     function scheduleResume(){
+      if(reduceMotion) return;
       if(resumeTimer){ clearTimeout(resumeTimer); }
       resumeTimer = setTimeout(function(){ autoOn = true; }, RESUME_DELAY);
     }
@@ -1156,7 +1158,7 @@
       if(!isDown){ autoOn = false; if(resumeTimer){ clearTimeout(resumeTimer); resumeTimer = null; } }
     });
     carousel.addEventListener('mouseleave', function(){
-      if(!isDown){ autoOn = true; }
+      if(!isDown && !reduceMotion){ autoOn = true; }
     });
 
     // pointer drag (mouse + touch + pen)
