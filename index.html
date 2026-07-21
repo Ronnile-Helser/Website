@@ -372,12 +372,20 @@
   .cf-dot{width:6px;height:6px;border-radius:50%;background:rgba(179,160,110,.3);transition:all .3s ease;cursor:pointer}
   .cf-dot.active{background:var(--khaki);width:18px;border-radius:4px}
 
+  @media(max-width:640px){
+    .cf-card{
+      width:250px;height:340px;margin:-170px 0 0 -125px;
+      /* touch expects near-instant feedback — the slow desktop timing feels
+         broken on a tap, so mobile gets its own much faster transition */
+      transition:transform .45s cubic-bezier(.16,1,.3,1), opacity .3s ease-out, filter .3s ease-out;
+    }
+    .coverflow{height:400px}
+  }
+  /* placed after the mobile block so it always wins the cascade, even for
+     a mobile viewport — a person who asked for reduced motion should get
+     it regardless of screen size */
   @media (prefers-reduced-motion: reduce){
     .cf-card{transition:opacity .3s ease}
-  }
-  @media(max-width:640px){
-    .cf-card{width:250px;height:340px;margin:-170px 0 0 -125px}
-    .coverflow{height:400px}
   }
 
   /* RESUME */
@@ -646,18 +654,7 @@
       <h3>Azure Tenant Configuration</h3>
       <p>Built and configured a personal Microsoft Azure tenant &mdash; setting up Entra ID, users, and cloud identity to practice modern cloud administration and security.</p>
       <div class="stack"><span>Azure</span><span>Entra ID</span><span>Cloud Admin</span></div>
-    </div>
-    <div class="project-card reveal">
-      <div class="tag">Network Analysis</div>
-      <h3>Packet Capture &amp; Traffic Analysis</h3>
-      <p>Hands-on traffic capture and analysis with Wireshark &mdash; inspecting protocols, following streams, and identifying anomalies across lab network traffic.</p>
-      <div class="stack"><span>Wireshark</span><span>Networking</span><span>Protocol Analysis</span></div>
-    </div>
-    <div class="project-card reveal">
-      <div class="tag">Threat Detection</div>
-      <h3>Attack Technique Practice</h3>
-      <p>Applied study of real attack patterns &mdash; MITRE ATT&amp;CK mapping, business email compromise phishing, default credential attacks, and threat actor classification.</p>
-      <div class="stack"><span>MITRE ATT&amp;CK</span><span>Phishing</span><span>Detection</span></div>
+      <a href="projects/azure-tenant.html" class="card-link">View Details &#8594;</a>
     </div>
   </div>
 </section>
