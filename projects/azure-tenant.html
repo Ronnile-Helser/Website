@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Azure Tenant Configuration — Ronnile Helser</title>
+<meta name="description" content="Project deep dive: standing up a personal Azure tenant, Entra ID identity design, and building an AI agent in Microsoft Foundry, by Ronnile Helser.">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%231a1c20'/%3E%3Ctext x='32' y='44' font-family='Segoe UI,Arial,sans-serif' font-size='30' font-weight='700' fill='%23b3a06e' text-anchor='middle'%3ERH%3C/text%3E%3C/svg%3E">
+<style>
+  :root{
+    --khaki:#b3a06e;
+    --khaki-light:#cbbd96;
+    --khaki-dark:#8a7a4f;
+    --gray:#6b7177;
+    --gray-light:#9aa1a8;
+    --charcoal:#23262b;
+    --charcoal-soft:#2e3238;
+    --bg:#1a1c20;
+    --text:#e8e6e0;
+    --text-dim:#a8a8a2;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  ::selection{background:var(--khaki);color:var(--charcoal)}
+  a:focus-visible,button:focus-visible{outline:2px solid var(--khaki);outline-offset:3px;border-radius:4px}
+  body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
+  a{color:inherit;text-decoration:none}
+
+  nav{
+    position:sticky;top:0;z-index:100;
+    display:flex;justify-content:space-between;align-items:center;
+    padding:1rem 2.5rem;
+    background:rgba(26,28,32,.85);backdrop-filter:blur(12px);
+    border-bottom:1px solid rgba(179,160,110,.15);
+  }
+  nav .brand{font-weight:700;letter-spacing:.5px;color:var(--khaki);cursor:pointer;transition:color .2s,transform .2s;display:inline-block}
+  nav .brand:hover{color:var(--khaki-light);transform:translateY(-1px)}
+  .back-link{
+    font-size:.8rem;letter-spacing:1px;text-transform:uppercase;
+    color:var(--khaki-light);display:flex;align-items:center;gap:.5rem;
+    transition:color .2s;
+  }
+  .back-link:hover{color:var(--khaki)}
+
+  main{max-width:840px;margin:0 auto;padding:4rem 2.5rem 6rem}
+
+  .breadcrumb{color:var(--khaki);font-size:.78rem;letter-spacing:2px;text-transform:uppercase;margin-bottom:1rem}
+  h1{font-size:clamp(2rem,5vw,3rem);font-weight:800;letter-spacing:-.5px;margin-bottom:.8rem}
+  .meta-row{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:2.2rem}
+  .meta-row span{
+    font-size:.72rem;letter-spacing:1px;padding:.35rem .75rem;
+    background:rgba(179,160,110,.08);border:1px solid rgba(179,160,110,.35);
+    border-radius:30px;color:var(--khaki-light);text-transform:uppercase;
+  }
+  .lede{font-size:1.15rem;color:var(--text-dim);margin-bottom:2.5rem;max-width:680px}
+
+  .shot{
+    width:100%;border-radius:12px;display:block;margin-bottom:.6rem;
+    border:1px solid rgba(179,160,110,.25);box-shadow:0 20px 50px rgba(0,0,0,.45);
+  }
+  .shot-ph{
+    width:100%;aspect-ratio:16/9;border-radius:12px;margin-bottom:.6rem;
+    display:flex;align-items:center;justify-content:center;flex-direction:column;gap:.4rem;
+    background:linear-gradient(150deg,var(--charcoal-soft),var(--charcoal));
+    border:1px solid rgba(179,160,110,.2);color:var(--gray-light);
+    font-size:.85rem;letter-spacing:1px;text-transform:uppercase;text-align:center;padding:1rem;
+  }
+  .caption{font-size:.8rem;color:var(--gray-light);font-style:italic;margin-bottom:2.5rem}
+
+  h2{font-size:1.1rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--khaki);margin:2.5rem 0 1rem}
+  h3{font-size:.95rem;letter-spacing:.5px;color:var(--text);margin:0 0 .6rem}
+  p{color:var(--text-dim);font-size:1.05rem;line-height:1.75;margin-bottom:1.3rem;max-width:720px}
+  p strong{color:var(--text)}
+
+  .sub-block{margin-bottom:2.8rem}
+  .sub-block:last-child{margin-bottom:0}
+
+  .stack-row{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:2.5rem}
+  .stack-row span{font-size:.78rem;padding:.35rem .8rem;background:rgba(107,113,119,.25);border-radius:5px;color:var(--text)}
+
+  .cta-row{display:flex;gap:1rem;flex-wrap:wrap;margin-top:3rem;padding-top:2.5rem;border-top:1px solid rgba(179,160,110,.15)}
+  .btn{
+    padding:.8rem 1.6rem;border-radius:6px;font-size:.82rem;
+    letter-spacing:1px;text-transform:uppercase;cursor:pointer;
+    transition:all .25s;border:1px solid var(--khaki);display:inline-block;
+  }
+  .btn-primary{background:var(--khaki);color:var(--charcoal);font-weight:600}
+  .btn-primary:hover{background:var(--khaki-light);transform:translateY(-2px)}
+  .btn-ghost{background:transparent;color:var(--khaki-light)}
+  .btn-ghost:hover{background:rgba(179,160,110,.1);transform:translateY(-2px)}
+
+  footer{text-align:center;padding:2.5rem;color:var(--gray-light);font-size:.8rem;border-top:1px solid rgba(179,160,110,.12)}
+
+  @media(max-width:640px){
+    nav{padding:1rem 1.3rem}
+    main{padding:2.5rem 1.3rem 4rem}
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="brand" href="../index.html" aria-label="Back to portfolio">RH</a>
+  <a class="back-link" href="../index.html">&#8592; Back to Portfolio</a>
+</nav>
+
+<main>
+  <div class="breadcrumb">Home Lab &amp; Projects &middot; Cloud &amp; Identity</div>
+  <h1>Azure Tenant Configuration</h1>
+  <div class="meta-row">
+    <span>Azure</span><span>Entra ID</span><span>Identity &amp; Access</span><span>Microsoft Foundry</span><span>Defender</span>
+  </div>
+  <p class="lede">A personal Microsoft 365 / Azure tenant built from scratch: custom domain, a full identity structure in Entra ID, hardened security posture, and an AI agent built and called through Microsoft Foundry &mdash; hands-on practice with the same platform covered on my AI-901 exam.</p>
+
+  <h2>What I Built</h2>
+  <p>I stood up a personal Azure tenant on a custom domain and used it as a live environment for practicing cloud identity administration rather than working through screenshots in a course. That meant creating real users with real attributes, structuring them into groups that reflect actual access-control patterns, and holding myself to the same security posture I'd expect to maintain in a production tenant.</p>
+  <p>Rather than populate the tenant with generic "Test User 1" accounts, I built out a full Hogwarts-themed identity roster &mdash; staff, students, and my own account among them &mdash; each with a real job title, department, and company name. It's a deliberate choice: memorable test data makes it obvious at a glance whether a role assignment or group membership is behaving the way I intended, which is harder to judge when every account is named the same generic thing.</p>
+
+  <div class="sub-block">
+    <h3>Identity roster in Entra ID</h3>
+    <img class="shot" src="../images/azure-tenant/entra-users.png" alt="Entra ID users list showing a themed roster of staff and student accounts with job titles and departments" onerror="this.outerHTML='<div class=&quot;shot-ph&quot;><strong style=&quot;color:var(--khaki);font-size:1.1rem;letter-spacing:0;text-transform:none&quot;>Entra ID Users</strong>Place your image at images/azure-tenant/entra-users.png</div>'">
+    <p class="caption">Entra ID &middot; Users &mdash; 14 accounts across staff and student roles, each carrying a job title, department, and company name.</p>
+    <p>Every account has a distinct department (Gryffindor, Slytherin, Ravenclaw, Groundskeeping, IT) and job title (Headmaster, Professor, Student, Groundskeeper), which lets me test department- and title-based conditional access or dynamic group rules against data that actually varies, instead of a flat list of identical placeholder users. My own account sits in the list as well, provisioned with a MicrosoftAccount identity rather than the tenant's own directory, which is how a personal account looks when it's invited into a tenant rather than created natively in it, a distinction worth being able to recognize when reviewing a real directory.</p>
+  </div>
+
+  <div class="sub-block">
+    <h3>Group structure</h3>
+    <img class="shot" src="../images/azure-tenant/entra-groups.png" alt="Entra ID groups list mixing Security and Microsoft 365 group types for access control" onerror="this.outerHTML='<div class=&quot;shot-ph&quot;><strong style=&quot;color:var(--khaki);font-size:1.1rem;letter-spacing:0;text-transform:none&quot;>Entra ID Groups</strong>Place your image at images/azure-tenant/entra-groups.png</div>'">
+    <p class="caption">Entra ID &middot; Groups &mdash; a mix of Security and Microsoft 365 group types, each standing in for a real access-control scenario.</p>
+    <p>I built out ten groups split across both group types Entra supports: Microsoft 365 groups for the collaborative, everyone-in-a-role cases (Professors, Student, AllStaff, Detentions), and Security groups for narrower, permission-style access (Kitchen Access, International Travel, Interschool Apparition, Floo Network, Tri-Wizard Tournament Council). That split matters in a real tenant: M365 groups come with a shared mailbox and calendar, while Security groups are the right tool when the only thing you need is a permission boundary. Structuring both types side by side let me practice deciding which one fits a given access scenario instead of defaulting to one for everything.</p>
+  </div>
+
+  <div class="sub-block">
+    <h3>Security posture</h3>
+    <img class="shot" src="../images/azure-tenant/secure-score.png" alt="Microsoft Defender Secure Score dashboard showing 98.21 percent, 55 of 56 points achieved" onerror="this.outerHTML='<div class=&quot;shot-ph&quot;><strong style=&quot;color:var(--khaki);font-size:1.1rem;letter-spacing:0;text-transform:none&quot;>Secure Score</strong>Place your image at images/azure-tenant/secure-score.png</div>'">
+    <p class="caption">Microsoft Defender &middot; Secure Score &mdash; 98.21%, 55 of 56 points, entirely within the Identity category.</p>
+    <p>I used Microsoft Defender's Secure Score as a running scorecard while hardening the tenant, and the trend line shows the real work: a jump from roughly 90% up to 98.21% as I worked through Identity recommendations, things like enforcing MFA, tightening sign-in risk policies, and closing default-configuration gaps that Microsoft flags out of the box. Getting a tenant to a high score isn't a one-time toggle, it's going recommendation by recommendation and understanding what each one actually changes about the tenant's exposure before applying it.</p>
+  </div>
+
+  <div class="sub-block">
+    <h3>Building an AI agent in Microsoft Foundry</h3>
+    <img class="shot" src="../images/azure-tenant/foundry-agent-playground.png" alt="Microsoft Foundry agent playground showing a GPT-5 model, voice mode, instructions panel, and a test chat session" onerror="this.outerHTML='<div class=&quot;shot-ph&quot;><strong style=&quot;color:var(--khaki);font-size:1.1rem;letter-spacing:0;text-transform:none&quot;>Foundry Playground</strong>Place your image at images/azure-tenant/foundry-agent-playground.png</div>'">
+    <p class="caption">Microsoft Foundry &middot; Agent Playground &mdash; a GPT-5-backed agent configured with tools, voice mode, and a live test session.</p>
+    <p>Past standing up the identity side, I used this tenant to build and test an actual agent in Microsoft Foundry, the platform covered on my AI-901 exam. The Playground shows the agent wired to a GPT-5 Global Standard deployment, with Voice mode enabled for a voice-first experience and Web Search grounded through Bing as a connected tool. I ran a live test session that had the agent produce a structured breakdown of classification metrics &mdash; accuracy, precision, recall, and F1, alongside sample hyperparameters, a sample inference, and a set of responsible AI checks (PII redaction, bias evaluation, and a human-in-the-loop threshold for low-confidence predictions). That last part matters as much as the model output: configuring an agent responsibly means deciding up front what it's allowed to do with sensitive data and when it has to defer to a person, not bolting that on afterward.</p>
+    <img class="shot" src="../images/azure-tenant/foundry-agent-sdk.png" alt="Python code sample using the Azure AI Projects SDK to call the agent programmatically" onerror="this.outerHTML='<div class=&quot;shot-ph&quot;><strong style=&quot;color:var(--khaki);font-size:1.1rem;letter-spacing:0;text-transform:none&quot;>Foundry SDK</strong>Place your image at images/azure-tenant/foundry-agent-sdk.png</div>'">
+    <p class="caption">Calling the agent outside the Playground with the <code>azure-ai-projects</code> Python SDK.</p>
+    <p>Building an agent in a chat UI is one thing; calling it from code is what makes it usable in an actual application. I used the <code>azure-ai-projects</code> SDK with <code>DefaultAzureCredential</code> to authenticate against my Foundry project endpoint, then referenced the agent I'd built (<code>ai901-practice</code>) by name and version rather than hardcoding the model directly, which is the pattern Foundry expects so an agent's configuration can be iterated on independently of the code that calls it. This is the piece that ties the whole project together: the identity and security work in Entra gives the tenant a real foundation, and the Foundry agent shows I can build on top of that foundation, not just administer it.</p>
+  </div>
+
+  <h2>What I Learned</h2>
+  <p>The identity side reinforced something that's easy to gloss over when reading about Entra rather than configuring it: groups aren't interchangeable, and choosing the wrong type costs you real functionality later. Deciding between a Security group and a Microsoft 365 group for each of my ten groups forced me to actually think through what each one needed, a shared mailbox versus a pure access boundary, instead of defaulting to whichever type I created first.</p>
+  <p>The Secure Score work taught me that tenant hardening is iterative and explainable, not a single switch. Each recommendation Defender surfaces maps to a specific, nameable risk, and closing the gap from roughly 90% to 98.21% meant understanding each one well enough to defend the change, not just clicking "fix."</p>
+  <p>Foundry was the newest territory. Building an agent in the Playground is approachable, but the responsible AI configuration, PII redaction, bias evaluation, human-in-the-loop thresholds, is where the platform expects real judgment calls, not defaults. Pairing that with the SDK call showed me the full lifecycle: design and test an agent visually, then integrate it the way a real application would.</p>
+
+  <h2>Challenges &amp; Pivots</h2>
+  <p>Getting the Foundry SDK sample running took more than copying the code. Authenticating with <code>DefaultAzureCredential</code> outside of an interactive Azure CLI session required making sure my local credential chain actually resolved against the right tenant, and I had to reference the agent by its exact name and version rather than assuming the SDK would pick up the "latest" version automatically. Small detail, but it's the kind of thing that only shows up once you try to call an agent from code instead of clicking it in a browser.</p>
+  <p>On the identity side, the temptation with a personal tenant is to under-build it, a handful of users, one group, done. Committing to a full themed roster with real departments and a real group taxonomy took longer, but it's the difference between a tenant that looks configured and one that's actually exercised the parts of Entra I'll need to know for production work.</p>
+
+  <div class="stack-row">
+    <span>Microsoft Entra ID</span><span>Microsoft Defender</span><span>Microsoft Foundry</span><span>Azure AI Projects SDK</span><span>Python</span><span>Conditional Access</span><span>Identity Governance</span>
+  </div>
+
+  <div class="cta-row">
+    <a href="../index.html#projects" class="btn btn-primary">&#8592; Back to All Projects</a>
+    <a href="../index.html#contact" class="btn btn-ghost">Get in Touch</a>
+  </div>
+</main>
+
+<footer>
+  &copy; <span id="year"></span> Ronnile Helser &middot; IT &amp; Security
+</footer>
+
+<script>
+  document.getElementById('year').textContent = new Date().getFullYear();
+</script>
+</body>
+</html>
